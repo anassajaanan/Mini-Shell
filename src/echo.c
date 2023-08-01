@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/01 19:58:38 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/01 21:05:40 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,49 @@ int	is_valid_echo_command(char *command)
 	return (1);
 }
 
+void	handle_double_quoted_string(char *command, int *i)
+{
+	(*i)++;
+	while (command[*i] && command[*i] != '"')
+	{
+		if (command[*i] == '\\')
+		{
+			(*i)++;
+			while (command[*i] && command[*i] == '\\')
+				write(1, &command[(*i)++], 1);
+		}
+		else
+			write(1, &command[(*i)++], 1);
+	}
+	if (command[*i] == '"')
+		(*i)++;
+}
+
+
+void	handle_single_quoted_string(char *command, int *i)
+{
+	(*i)++;
+	while (command[*i] && command[*i] != '\'')
+		write(1, &command[(*i)++], 1);
+	if (command[*i] == '\'')
+		(*i)++;
+}
+
+void	handle_backslashes_and_spaces(char *command, int *i)
+{
+	if (command[*i] == '\\')
+	{
+		(*i)++;
+		while (command[*i] && command[*i] == '\\')
+			write(1, &command[(*i)++], 1);
+	}
+	else if (command[*i] == ' ')
+	{
+		write(1, &command[(*i)++], 1);
+		while (command[*i] && command[*i] == ' ')
+			(*i)++;
+	}
+}
 
 void	echo(char *command)
 {
@@ -50,6 +93,8 @@ void	echo(char *command)
 	
 	i = 0;
 	new_line = 1;
+	if (!is_valid_echo_command(command))
+		return ;
 	while (command[i] && command[i] == ' ')
 		i++;
 	if (ft_strncmp(command + i, "-n", 2) == 0)
@@ -62,42 +107,11 @@ void	echo(char *command)
 	while (command[i])
 	{
 		if (command[i] == '"')
-		{
-			i++;
-			while (command[i] && command[i] != '"')
-			{
-				if (command[i] == 92)
-				{
-					i++;
-					while (command[i] && command[i] == 92)
-						write(1, &command[i++], 1);
-				}
-				else
-					write(1, &command[i++], 1);
-			}
-			if (command[i] == '"')
-				i++;
-		}
+			handle_double_quoted_string(command, &i);
 		else if (command[i] == '\'')
-		{
-			i++;
-			while (command[i] && command[i] != '\'')
-				write(1, &command[i++], 1);
-			if (command[i] == '\'')
-				i++;
-		}
-		else if (command[i] == 92)
-		{
-			i++;
-			while (command[i] && command[i] == 92)
-				write(1, &command[i++], 1);
-		}
-		else if (command[i] == ' ')
-		{
-			write(1, &command[i++], 1);
-			while (command[i] && command[i] == ' ')
-				i++;
-		}
+			handle_single_quoted_string(command, &i);
+		else if (command[i] == '\\' || command[i] == ' ')
+			handle_backslashes_and_spaces(command, &i);
 		else
 			write(1, &command[i++], 1);
 	}
