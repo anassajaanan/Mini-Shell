@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: malmessa <malmessa@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/02 10:10:13 by malmessa         ###   ########.fr       */
+/*   Updated: 2023/08/02 10:21:41 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,35 @@ int	is_valid_echo_command(char *command)
 	return (1);
 }
 
+int	is_space(char c)
+{
+	if ((c >= 9 && c <= 13) || c == ' ')
+		return (1);
+	return (0);
+}
+
+void	extract_variable_name(char *command, char *variable_name, int *i)
+{
+	int	j;
+
+	j = 0;
+	while (command[*i] && !is_space(command[*i]))
+	{
+		variable_name[j] = command[*i];
+		(*i)++;
+		j++;
+	}
+	variable_name[j] = '\0';
+}
+
 
 void	echo(char *command)
 {
-	int	i;
-	int	count;
-	int	new_line;
+	int		i;
+	int		count;
+	int		new_line;
+	char	variable_name[250];
+	char	*variable_value;
 	
 	i = 0;
 	new_line = 1;
@@ -85,6 +108,14 @@ void	echo(char *command)
 						count--;
 					}
 				}
+				if (command[i] == '$')
+				{
+					i++;
+					extract_variable_name(command, variable_name, &i);
+					variable_value = getenv(variable_name);
+					if (variable_value)
+						ft_printf("%s", variable_value);
+				}
 				else
 					write(1, &command[i++], 1);
 			}
@@ -98,6 +129,14 @@ void	echo(char *command)
 				write(1, &command[i++], 1);
 			if (command[i] == '\'')
 				i++;
+		}
+		else if (command[i] == '$')
+		{
+			i++;
+			extract_variable_name(command, variable_name, &i);
+			variable_value = getenv(variable_name);
+			if (variable_value)
+				ft_printf("%s", variable_value);
 		}
 		else if (command[i] == 92)
 		{

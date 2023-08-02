@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 15:25:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/01 19:59:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/02 10:14:32 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,7 @@ int main(void)
 	char	*command;
 	while (1)
 	{
-		printf(MAG "MyShell$ " reset);
-		fflush(stdout);
+		ft_printf(MAG "MyShell$ " reset);
 		line = get_next_line(0);
 		command = ft_strtrim(line, " \n\t\v\f\r");
 		if (ft_strncmp(command, "echo ", 5) == 0)

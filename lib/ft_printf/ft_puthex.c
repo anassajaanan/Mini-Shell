@@ -1,24 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_puthex.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/01 10:25:11 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/02 10:10:26 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/06/04 11:24:12 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/06/04 11:24:12 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
+#include "ft_printf.h"
 
-#include "../lib/libft/libft.h"
-#include "../lib/ft_printf/ft_printf.h"
-#include "../lib/get_next_line/get_next_line.h"
-#include "../include/colors.h"
+void	ft_puthex(uintptr_t n, char case_type, int *counter)
+{
+	char	*hex;
 
-// echo.c
-void	echo(char *command);
+	hex = "0123456789abcdef";
+	if (case_type == 'X')
+		hex = "0123456789ABCDEF";
+	if (n >= 16)
+	{
+		ft_puthex(n / 16, case_type, counter);
+		ft_puthex(n % 16, case_type, counter);
+	}
+	else
+		ft_putchar(hex[n], counter);
+}

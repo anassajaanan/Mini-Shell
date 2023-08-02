@@ -11,16 +11,19 @@ CFLAGS = -Wall -Wextra -Werror
 
 ${NAME}: ${OBJS}
 	@make -C ./lib/libft
-	${CC} ${CFLAGS} -L./lib/libft -lft -o ${NAME} ${OBJS}
+	@make -C ./lib/ft_printf
+	${CC} ${CFLAGS} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
 
 all: ${NAME}
 
 clean:
 	@make clean -C ./lib/libft
+	@make clean -C ./lib/ft_printf
 	rm -f ${OBJS}
 
 fclean: clean
 	@make fclean -C ./lib/libft
+	@make fclean -C ./lib/ft_printf
 	rm -f ${NAME}
 
 re: fclean all
