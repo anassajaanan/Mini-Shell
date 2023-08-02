@@ -2,6 +2,7 @@ NAME = minishell
 
 SRCS = ./src/main.c \
 		./src/echo.c \
+		./src/export.c \
 		./lib/get_next_line/get_next_line.c \
 		./lib/get_next_line/get_next_line_utils.c \
 

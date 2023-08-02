@@ -1,27 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/01 10:25:11 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/02 12:14:50 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/02 12:12:36 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/02 12:14:39 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
+#include "../include/minishell.h"
 
-#include "../lib/libft/libft.h"
-#include "../lib/ft_printf/ft_printf.h"
-#include "../lib/get_next_line/get_next_line.h"
-#include "../include/colors.h"
+void	print_environment_variables()
+{
+	extern char	**environ;
+	char		**env;
 
-// echo.c
-void	echo(char *command);
-
-// export.c
-void	print_environment_variables();
+	env = environ;
+	while (*env)
+	{
+		ft_printf("declare -x %s\n", *env);
+		env++;
+	}
+}
