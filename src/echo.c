@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/02 10:21:41 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/02 11:00:29 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,78 @@ void	extract_variable_name(char *command, char *variable_name, int *i)
 	variable_name[j] = '\0';
 }
 
+void handle_backslashes(char *command, int *i, int inside_quotes)
+{
+	int	count;
+
+	count = 0;
+	while (command[*i] && command[*i] == '\\')
+	{
+		(*i)++;
+		count++;	
+	}
+	if (inside_quotes && count % 2 == 1)
+		count = (count / 2) + 1;
+	else
+		count = count / 2;
+	while (count > 0)
+	{
+		write(1, "\\", 1);
+		count--;
+	}
+}
+
+void	handle_space(char *command, int *i)
+{
+	write(1, " ", 1);
+	while (command[*i] && command[*i] == ' ')
+		(*i)++;
+}
+
+void	handle_environment_variable(char *command, int *i)
+{
+	char	variable_name[250];
+	char	*variable_value;
+
+	(*i)++;
+	extract_variable_name(command, variable_name, i);
+	variable_value = getenv(variable_name);
+	if (variable_value)
+		ft_printf("%s", variable_value);
+}
+
+void	handle_double_quoted_string(char *command, int *i)
+{
+	(*i)++;
+	while (command[*i] && command[*i] != '"')
+	{
+		if (command[*i] == '\\')
+			handle_backslashes(command, i, 1);
+		else if (command[*i] == '$')
+			handle_environment_variable(command, i);
+		else
+			write(1, &command[(*i)++], 1);
+	}
+	if (command[*i] == '"')
+		(*i)++;
+}
+
+void	handle_single_quoted_string(char *command, int *i)
+{
+	(*i)++;
+	while (command[*i] && command[*i] != '\'')
+		write(1, &command[(*i)++], 1);
+	if (command[*i] == '\'')
+		(*i)++;
+}
+
+
+
 
 void	echo(char *command)
 {
 	int		i;
-	int		count;
 	int		new_line;
-	char	variable_name[250];
-	char	*variable_value;
 	
 	i = 0;
 	new_line = 1;
@@ -86,79 +150,15 @@ void	echo(char *command)
 	while (command[i])
 	{
 		if (command[i] == '"')
-		{
-			i++;
-			while (command[i] && command[i] != '"')
-			{
-				if (command[i] == 92)
-				{
-					count = 0;
-					while (command[i] && command[i] == 92)
-					{
-						i++;
-						count++;	
-					}
-					if (count % 2 == 1)
-						count = (count / 2) + 1;
-					else 
-						count = count / 2;
-					while (count > 0)
-					{
-						write(1, "\\", 1);
-						count--;
-					}
-				}
-				if (command[i] == '$')
-				{
-					i++;
-					extract_variable_name(command, variable_name, &i);
-					variable_value = getenv(variable_name);
-					if (variable_value)
-						ft_printf("%s", variable_value);
-				}
-				else
-					write(1, &command[i++], 1);
-			}
-			if (command[i] == '"')
-				i++;
-		}
+			handle_double_quoted_string(command, &i);
 		else if (command[i] == '\'')
-		{
-			i++;
-			while (command[i] && command[i] != '\'')
-				write(1, &command[i++], 1);
-			if (command[i] == '\'')
-				i++;
-		}
+			handle_single_quoted_string(command, &i);
 		else if (command[i] == '$')
-		{
-			i++;
-			extract_variable_name(command, variable_name, &i);
-			variable_value = getenv(variable_name);
-			if (variable_value)
-				ft_printf("%s", variable_value);
-		}
-		else if (command[i] == 92)
-		{
-			count = 0;
-			while (command[i] && command[i] == 92)
-			{
-				i++;
-				count++;	
-			}
-			count = count / 2;
-			while (count > 0)
-			{
-				write(1, "\\", 1);
-				count--;
-			}
-		}
+			handle_environment_variable(command, &i);
+		else if (command[i] == '\\')
+			handle_backslashes(command, &i, 0);
 		else if (command[i] == ' ')
-		{
-			write(1, &command[i++], 1);
-			while (command[i] && command[i] == ' ')
-				i++;
-		}
+			handle_space(command, &i);
 		else
 			write(1, &command[i++], 1);
 	}
