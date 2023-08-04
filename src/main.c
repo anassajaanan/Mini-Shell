@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 15:25:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 14:29:01 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/04 16:06:35 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,16 @@ void	cd(char *directory)
 
 }
 
+void	free_params(t_params *params)
+{
+	if (params->line)
+		free(params->line);
+	if (params->command)
+		free(params->command);
+	if (params->args)
+		free_args(params->args);
+}
+
 
 int main(void)
 {
@@ -51,9 +61,8 @@ int main(void)
 			echo(params.command + 5);
 		if (params.args && strcmp(params.args[0], "export") == 0)
 			handle_export_command(&params);
-		free(params.line);
-		free_args(params.args);
-		free(params.command);
+		free_params(&params);
 	}
+	free_params(&params);
 	free_env_var_list(params.env_var_list);
 }
