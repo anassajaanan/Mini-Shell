@@ -6,12 +6,11 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 15:25:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/02 12:26:52 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/04 11:04:50 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-#include "../include/colors.h"
 
 void pwd()
 {
@@ -34,45 +33,25 @@ void	cd(char *directory)
 }
 
 
-
-void	free_args(char **args)
-{
-	int	i;
-
-	i = 0;
-	if (args == NULL)
-		return ;
-	while (args[i])
-	{
-		free(args[i]);
-		i++;
-	}
-	free(args);
-	args = NULL;
-}
-
-
 int main(void)
 {
-	char	*line;
-	char	*command;
-	char	**args;
+	t_params	params;
 	
+	params.env_var_list = NULL;
+	copy_env_to_list(&params.env_var_list);
 	while (1)
 	{
 		ft_printf(MAG "MyShell$ " reset);
-		line = get_next_line(0);
-		command = ft_strtrim(line, " \n\t\v\f\r");
-		args = ft_split(command, ' ');
-		if (ft_strncmp(command, "echo ", 5) == 0)
-			echo(command + 5);
-		if (args && strcmp(args[0], "export") == 0)
-		{
-			if (args[1] == NULL)
-				print_environment_variables();
-		}
-		free(line);
-		free(args);
-		free(command);
+		params.line = get_next_line(0);
+		params.command = ft_strtrim(params.line, " \n\t\v\f\r");
+		params.args = ft_split(params.command, ' ');
+		if (ft_strncmp(params.command, "echo ", 5) == 0)
+			echo(params.command + 5);
+		if (params.args && strcmp(params.args[0], "export") == 0)
+			print_environment_variables(params.env_var_list);
+		free(params.line);
+		free_args(params.args);
+		free(params.command);
+		free_env_var_list(params.env_var_list);
 	}
 }

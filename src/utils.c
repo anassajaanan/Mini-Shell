@@ -1,25 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/02 12:12:36 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 10:35:18 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/04 11:01:18 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/04 11:02:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	print_environment_variables(t_env_var *env_var_list)
+void	free_args(char **args)
 {
-	t_env_var	*current;
+	int	i;
 
-	current = env_var_list;
-	while (current)
+	i = 0;
+	if (args == NULL)
+		return ;
+	while (args[i])
 	{
-		ft_printf("%s=\"%s\"\n", current->key, current->value);
-		current = current->next;
+		free(args[i]);
+		i++;
 	}
+	free(args);
+	args = NULL;
 }
