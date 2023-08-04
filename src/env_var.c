@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 17:53:48 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/04 18:58:25 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,19 @@ void	unset_env_var(t_params *params)
 		q->next = p->next;
 		free_env_var_node(p);
 		i++;
+	}
+}
+
+void	print_env(t_env_var *env_var_list)
+{
+	t_env_var	*tmp;
+
+	tmp = env_var_list;
+	while (tmp)
+	{
+		if (tmp->value)
+			ft_printf("%s=%s\n", tmp->key, tmp->value);
+		tmp = tmp->next;
 	}
 }
 

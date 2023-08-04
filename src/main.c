@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 15:25:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 17:50:43 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/04 19:05:33 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,16 +47,20 @@ int main(void)
 		params.line = get_next_line(0);
 		params.command = ft_strtrim(params.line, " \n\t\v\f\r");
 		params.args = ft_split(params.command, ' ');
-		if (ft_strncmp(params.command, "exit", 4) == 0)
+		if (ft_strncmp(params.command, "exit ", 5) == 0)
+		{
+			free_params(&params);
 			break;
+		}
 		if (ft_strncmp(params.command, "echo ", 5) == 0)
 			echo(params.command + 5);
 		if (params.args && strcmp(params.args[0], "export") == 0)
 			handle_export_command(&params);
-		if (ft_strncmp(params.command, "unset", 5) == 0)
+		if (strcmp(params.args[0], "unset") == 0)
 			unset_env_var(&params);
+		if (strcmp(params.args[0], "env") == 0)
+			print_env(params.env_var_list);
 		free_params(&params);
 	}
-	free_params(&params);
 	free_env_var_list(params.env_var_list);
 }
