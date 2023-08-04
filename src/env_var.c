@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 13:38:11 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/04 14:50:55 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,25 @@ void	env_var_add_back(t_env_var **env_var_list, t_env_var *new_node)
 	last->next = new_node;
 }
 
+int	env_var_update_value(t_env_var **env_var_list, t_env_var *new_node)
+{
+	t_env_var	*tmp;
+
+	tmp = *env_var_list;
+	while (tmp)
+	{
+		if (strcmp(tmp->key, new_node->key) == 0)
+		{
+			free(tmp->value);
+			tmp->value = ft_strdup(new_node->value);
+			free_env_var_node(new_node);
+			return (1);
+		}
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
 void	env_var_insert_sorted(t_env_var **env_var_list, t_env_var *new_node)
 {
 	t_env_var	*p;
@@ -50,6 +69,8 @@ void	env_var_insert_sorted(t_env_var **env_var_list, t_env_var *new_node)
 	p = *env_var_list;
 	q = NULL;
 	if (!env_var_list || !new_node)
+		return ;
+	if (env_var_update_value(env_var_list, new_node))
 		return ;
 	if (!(*env_var_list))
 	{
@@ -77,7 +98,7 @@ void	copy_env_to_list(t_env_var **env_var_list)
 	extern char	**environ;
 	char		*value;
 	char		**key_value;
-	t_env_var	*new_node;
+	t_env_var	*new_node;     
 	
 	env = environ;
 	int i = 0;
@@ -92,6 +113,16 @@ void	copy_env_to_list(t_env_var **env_var_list)
 	}
 }
 
+
+void	free_env_var_node(t_env_var *node)
+{
+	if (node->key)
+		free(node->key);
+	if (node->value)
+		free(node->value);
+	free(node);
+}
+
 void	free_env_var_list(t_env_var *env_var_list)
 {
 	t_env_var	*current;
@@ -102,8 +133,6 @@ void	free_env_var_list(t_env_var *env_var_list)
 	{
 		tmp	= current;
 		current = current->next;
-		free(tmp->key);
-		free(tmp->value);
 		free(tmp);
 	}
 }
