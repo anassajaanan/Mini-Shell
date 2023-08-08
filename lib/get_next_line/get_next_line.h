@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:16:52 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/07/12 10:48:54 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/07 14:11:44 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,29 +20,29 @@
 #  define BUFFER_SIZE 1024
 # endif
 
-struct	s_queue_node
+struct	s_queue_node_char
 {
 	char				val;
-	struct s_queue_node	*next;
+	struct s_queue_node_char	*next;
 };
 
-typedef struct s_queue
+typedef struct s_queue_char
 {
-	struct s_queue_node	*front;
-	struct s_queue_node	*rear;
-}						t_queue;
+	struct s_queue_node_char	*front;
+	struct s_queue_node_char	*rear;
+}						t_queue_char;
 
 /* QUEUE */
-void	init_queue(t_queue *q);
-void	enqueue(t_queue *q, char c);
-char	dequeue(t_queue *q);
-int		queue_is_empty(t_queue *q);
+void	init_queue_char(t_queue_char *q);
+void	enqueue_char(t_queue_char *q, char c);
+char	dequeue_char(t_queue_char *q);
+int		queue_char_is_empty(t_queue_char *q);
 
 /* GET_NEXT_LINE */
-int		contains_newline(t_queue *q);
-char	*get_line(t_queue *q);
-char	*get_last_line(t_queue *q);
-char	*handle_bytes(ssize_t bytes, t_queue *q, char *buffer, int *fd);
+int		contains_newline(t_queue_char *q);
+char	*get_line(t_queue_char *q);
+char	*get_last_line(t_queue_char *q);
+char	*handle_bytes(ssize_t bytes, t_queue_char *q, char *buffer, int *fd);
 char	*get_next_line(int fd);
 
 #endif

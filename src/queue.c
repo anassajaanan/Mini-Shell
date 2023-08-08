@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
+/*   queue.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/04 18:15:36 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/07/12 10:47:56 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/07 14:02:46 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/07 15:18:12 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "../include/minishell.h"
 
 void	init_queue(t_queue *q)
 {
@@ -18,16 +18,16 @@ void	init_queue(t_queue *q)
 	q->rear = NULL;
 }
 
-void	enqueue(t_queue *q, char c)
+void	enqueue(t_queue *q, void *val)
 {
-	struct s_queue_node	*new_node;
+	t_queue_node	*new_node;
 
-	new_node = (struct s_queue_node *)malloc(sizeof(struct s_queue_node));
+	new_node = (t_queue_node *)malloc(sizeof(t_queue_node));
 	if (!new_node)
 		return ;
-	new_node->val = c;
+	new_node->val = val;
 	new_node->next = NULL;
-	if (q->front == NULL)
+	if (!q->front)
 	{
 		q->front = new_node;
 		q->rear = new_node;
@@ -39,21 +39,23 @@ void	enqueue(t_queue *q, char c)
 	}
 }
 
-char	dequeue(t_queue *q)
+void	*dequeue(t_queue *q)
 {
-	char				value;
-	struct s_queue_node	*tmp;
+	t_queue_node	*tmp;
+	void			*val;
 
+	if (!q->front)
+		return (NULL);
 	tmp = q->front;
+	val = tmp->val;
 	q->front = q->front->next;
-	value = tmp->val;
 	free(tmp);
-	return (value);
+	return (val);
 }
 
 int	queue_is_empty(t_queue *q)
 {
-	if (q->front == NULL)
+	if (!q->front)
 		return (1);
 	return (0);
 }

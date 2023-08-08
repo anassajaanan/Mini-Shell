@@ -6,11 +6,13 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 15:25:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/04 19:05:33 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/08 11:55:43 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+#include "readline/readline.h"
+#include "readline/history.h" 
 
 void pwd()
 {
@@ -32,35 +34,96 @@ void	cd(char *directory)
 
 }
 
-
-
-
-int main(void)
+int	fork1()
 {
+	int	pid;
+	
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return (EXIT_FAILURE);
+	}
+	return (pid);
+}
+
+int main(int argc, char **argv, char **envp)
+{
+	(void)argc;
+	(void)argv;
+	t_cmd		*cmd;
 	t_params	params;
 	
-	params.env_var_list = NULL;
-	copy_env_to_list(&params.env_var_list);
 	while (1)
 	{
-		ft_printf(MAG "MyShell$ " reset);
+		ft_printf(MAG "MyShell$: " reset);
 		params.line = get_next_line(0);
-		params.command = ft_strtrim(params.line, " \n\t\v\f\r");
-		params.args = ft_split(params.command, ' ');
-		if (ft_strncmp(params.command, "exit ", 5) == 0)
+		parse_commands_to_queue(&params);
+
+		int num_commands = 0;
+		t_queue_node *tmp = params.q.front;
+		while (tmp)
 		{
-			free_params(&params);
-			break;
+			num_commands++;
+			tmp = tmp->next;
 		}
-		if (ft_strncmp(params.command, "echo ", 5) == 0)
-			echo(params.command + 5);
-		if (params.args && strcmp(params.args[0], "export") == 0)
-			handle_export_command(&params);
-		if (strcmp(params.args[0], "unset") == 0)
-			unset_env_var(&params);
-		if (strcmp(params.args[0], "env") == 0)
-			print_env(params.env_var_list);
-		free_params(&params);
+
+		
+		int fd[num_commands - 1][2];
+		for (int i = 0; i < num_commands - 1; i++)
+		{
+			if (pipe(fd[i]) == -1)
+			{
+				perror("pipe");
+				return (EXIT_FAILURE);
+			}
+		}
+
+		int pid[num_commands];
+		for (int i = 0; i < num_commands; i++)
+		{
+			pid[i] = fork();
+			cmd = (t_cmd *)dequeue(&params.q);
+			if (pid[i] == 0)
+			{
+				for (int j = 0; j < num_commands - 1; j++)
+				{
+					if (j != i - 1)
+						close(fd[j][0]);
+					if (j != i)
+						close(fd[j][1]);
+				}
+				
+				if (i > 0)
+				{
+					dup2(fd[i - 1][0], STDIN_FILENO);
+					close(fd[i - 1][0]);
+				}
+				if (i < num_commands - 1)
+				{
+					dup2(fd[i][1], STDOUT_FILENO);
+					close(fd[i][1]);
+				}
+
+
+				int err = execve(cmd->path, cmd->args, envp);
+				if (err == -1)
+					perror("execve");
+				exit(EXIT_FAILURE);
+			}
+		}
+		for (int j = 0; j < num_commands - 1; j++)
+		{
+			close(fd[j][0]);
+			close(fd[j][1]);
+		}
+
+		for (int i = 0; i < num_commands; i++)
+			waitpid(pid[i], NULL, 0);
+
+		free(params.line);
+		free(params.full_command);
+		free_args(params.commands);
 	}
-	free_env_var_list(params.env_var_list);
+	return (0);
 }

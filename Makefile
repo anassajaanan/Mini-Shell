@@ -5,17 +5,27 @@ SRCS = ./src/main.c \
 		./src/export.c \
 		./src/env_var.c \
 		./src/utils.c \
+		./src/split.c \
+		./src/cmd.c \
+		./src/queue.c \
+		./src/cmd_parser.c \
 		./lib/get_next_line/get_next_line.c \
 		./lib/get_next_line/get_next_line_utils.c \
 
 OBJS = $(SRCS:.c=.o)
 
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror 
+
+READLINE_DIR = $(shell brew --prefix readline)
+
+READLINE_LIB = -lreadline -lhistory -L $(READLINE_DIR)/lib
+	
+INCLUDE = -Iinclude -I$(READLINE_DIR)/include 
 
 ${NAME}: ${OBJS}
 	@make -C ./lib/libft
 	@make -C ./lib/ft_printf
-	${CC} ${CFLAGS} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
+	${CC} ${CFLAGS} ${INCLUDE} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
 
 all: ${NAME}
 

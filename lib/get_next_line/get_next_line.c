@@ -6,15 +6,15 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:16:04 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/07/12 10:37:59 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/07 14:13:14 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	contains_newline(t_queue *q)
+int	contains_newline(t_queue_char *q)
 {
-	struct s_queue_node	*tmp;
+	struct s_queue_node_char	*tmp;
 
 	tmp = q->front;
 	while (tmp)
@@ -26,11 +26,11 @@ int	contains_newline(t_queue *q)
 	return (0);
 }
 
-char	*get_line(t_queue *q)
+char	*get_line(t_queue_char *q)
 {
-	int					i;
-	char				*line;
-	struct s_queue_node	*tmp;
+	int							i;
+	char						*line;
+	struct s_queue_node_char	*tmp;
 
 	i = 0;
 	tmp = q->front;
@@ -44,17 +44,17 @@ char	*get_line(t_queue *q)
 		return (NULL);
 	i = 0;
 	while (q->front && q->front->val != '\n')
-		line[i++] = dequeue(q);
-	line[i++] = dequeue(q);
+		line[i++] = dequeue_char(q);
+	line[i++] = dequeue_char(q);
 	line[i] = '\0';
 	return (line);
 }
 
-char	*get_last_line(t_queue *q)
+char	*get_last_line(t_queue_char *q)
 {
-	int					i;
-	char				*line;
-	struct s_queue_node	*tmp;
+	int							i;
+	char						*line;
+	struct s_queue_node_char	*tmp;
 
 	i = 0;
 	tmp = q->front;
@@ -68,12 +68,12 @@ char	*get_last_line(t_queue *q)
 		return (NULL);
 	i = 0;
 	while (q->front)
-		line[i++] = dequeue(q);
+		line[i++] = dequeue_char(q);
 	line[i] = '\0';
 	return (line);
 }
 
-char	*handle_bytes(ssize_t bytes, t_queue *q, char *buffer, int *fd)
+char	*handle_bytes(ssize_t bytes, t_queue_char *q, char *buffer, int *fd)
 {
 	ssize_t	i;
 
@@ -85,7 +85,7 @@ char	*handle_bytes(ssize_t bytes, t_queue *q, char *buffer, int *fd)
 	else if (bytes == 0)
 	{
 		free(buffer);
-		if (queue_is_empty(q))
+		if (queue_char_is_empty(q))
 			return (NULL);
 		else
 			return (get_last_line(q));
@@ -94,7 +94,7 @@ char	*handle_bytes(ssize_t bytes, t_queue *q, char *buffer, int *fd)
 	{
 		i = 0;
 		while (i < bytes)
-			enqueue(q, buffer[i++]);
+			enqueue_char(q, buffer[i++]);
 		free(buffer);
 		return (get_next_line(*fd));
 	}
@@ -102,7 +102,7 @@ char	*handle_bytes(ssize_t bytes, t_queue *q, char *buffer, int *fd)
 
 char	*get_next_line(int fd)
 {
-	static t_queue	q;
+	static t_queue_char	q;
 	ssize_t			bytes;
 	char			*buffer;
 	static int		flag = 0;
@@ -111,10 +111,10 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (flag == 0)
 	{
-		init_queue(&q);
+		init_queue_char(&q);
 		flag = 1;
 	}
-	if (!queue_is_empty(&q) && contains_newline(&q))
+	if (!queue_char_is_empty(&q) && contains_newline(&q))
 		return (get_line(&q));
 	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE);
 	if (!buffer)

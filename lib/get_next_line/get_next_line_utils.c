@@ -6,23 +6,23 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:56:35 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/07/12 10:48:30 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/07 14:11:19 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	init_queue(t_queue *q)
+void	init_queue_char(t_queue_char *q)
 {
 	q->front = NULL;
 	q->rear = NULL;
 }
 
-void	enqueue(t_queue *q, char c)
+void	enqueue_char(t_queue_char *q, char c)
 {
-	struct s_queue_node	*new_node;
+	struct s_queue_node_char	*new_node;
 
-	new_node = (struct s_queue_node *)malloc(sizeof(struct s_queue_node));
+	new_node = (struct s_queue_node_char *)malloc(sizeof(struct s_queue_node_char));
 	if (!new_node)
 		return ;
 	new_node->val = c;
@@ -39,10 +39,10 @@ void	enqueue(t_queue *q, char c)
 	}
 }
 
-char	dequeue(t_queue *q)
+char	dequeue_char(t_queue_char *q)
 {
 	char				value;
-	struct s_queue_node	*tmp;
+	struct s_queue_node_char	*tmp;
 
 	tmp = q->front;
 	q->front = q->front->next;
@@ -51,7 +51,7 @@ char	dequeue(t_queue *q)
 	return (value);
 }
 
-int	queue_is_empty(t_queue *q)
+int	queue_char_is_empty(t_queue_char *q)
 {
 	if (q->front == NULL)
 		return (1);

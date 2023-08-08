@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 07:24:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/07/05 16:41:45 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/07 10:45:30 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,11 @@ static int	is_separator(char c, char sep)
 static int	count_words(const char *str, char sep)
 {
 	int	i;
+	int	in_quote;
 	int	counter;
 
 	i = 0;
+	in_quote = 0;
 	counter = 0;
 	while (str[i])
 	{
