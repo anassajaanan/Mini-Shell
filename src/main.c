@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/12 15:21:43 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/12 20:28:55 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,11 +266,13 @@ t_cmd	*parse_exec(char **ps, char *es)
 	char		*eq;
 	int			argc;
 	int			token;
+	t_cmd		*ret;
 	
 	argc = 0;
 	cmd = execcmd();
 	exec_cmd = (t_execcmd *)cmd;
 	cmd = parse_redir(cmd, ps, es);
+	ret = cmd;
 	while (!peek(ps, es, "|"))
 	{
 		token = get_next_token(ps, es, &q, &eq);
@@ -281,11 +283,25 @@ t_cmd	*parse_exec(char **ps, char *es)
 		exec_cmd->args[argc] = q;
 		exec_cmd->eargs[argc] = eq;
 		argc++;
-		cmd = parse_redir(cmd, ps, es);
+		// cmd = parse_redir(cmd, ps, es);
+		if (cmd->type == REDIR)
+		{
+			if (peek(ps, es, "<>"))
+			{
+				ft_printf("#######REDIR#####\n");
+				((t_redircmd *)cmd)->subcmd = parse_redir((t_cmd *)exec_cmd, ps, es);
+				cmd = ((t_redircmd *)cmd)->subcmd;
+			}
+		}
+		else if (cmd->type == EXEC)
+		{
+			cmd = parse_redir(cmd, ps, es);
+			ret = cmd;
+		}
 	}
 	exec_cmd->args[argc] = NULL;
 	exec_cmd->eargs[argc] = NULL;
-	return (cmd);
+	return (ret);
 }
 
 t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
@@ -413,7 +429,8 @@ int main()
         if(forking() == 0)
         {
             main_tree = parse_cmd(buf);
-			run_cmd(main_tree);
+			display_tree(main_tree);
+			// run_cmd(main_tree);
         }
         wait(0);
 		free(buf);
