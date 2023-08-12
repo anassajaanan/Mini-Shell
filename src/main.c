@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/12 09:19:14 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/12 09:44:16 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,6 @@ t_cmd	*parseredir(t_cmd *subcmd, char **ps, char *es)
 	char	*eq;
 	int		tok;
 	t_cmd	*cmd;
-	t_cmd	*ret;
 
 	cmd = subcmd;
 	if (peek(ps, es, "<>"))
@@ -219,31 +218,13 @@ t_cmd	*parseredir(t_cmd *subcmd, char **ps, char *es)
 			panic("Syntax error : Missing file name after redirection");
 		}
 		if (tok == '<')
-			cmd = redircmd(subcmd, q, eq, O_RDONLY, 0);
+			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_RDONLY, 0);
 		else if (tok == '>')
-			cmd = redircmd(subcmd, q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
+			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
 		else if (tok == '+')
-			cmd = redircmd(subcmd, q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
-		ret = cmd;
+			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
 	}
-	while (peek(ps, es, "<>"))
-	{
-		tok = get_next_token(ps, es, 0, 0);
-		if (get_next_token(ps, es, &q, &eq) != 'a')
-		{
-			panic("Syntax error : Missing file name after redirection");
-		}
-		if (tok == '<')
-			((t_redircmd *)cmd)->subcmd = redircmd(subcmd, q, eq, O_RDONLY, 0);
-		else if (tok == '>')
-			((t_redircmd *)cmd)->subcmd = redircmd(subcmd, q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
-		else if (tok == '+')
-			((t_redircmd *)cmd)->subcmd = redircmd(subcmd, q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
-		cmd = ((t_redircmd *)cmd)->subcmd;
-	}
-	if (cmd == subcmd)
-		return (subcmd);
-	return (ret);
+	return (cmd);
 }
 
 t_cmd	*nullterminate(t_cmd *cmd)
