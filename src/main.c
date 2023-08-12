@@ -6,11 +6,37 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/12 09:44:16 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/12 15:21:43 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+//====================================PARSING=====================================//
+
+// 1) Parse command line
+
+// 2) Build the tree representation 
+
+// 3) Return the root node of the tree
+
+// -------------------------------FUNC PARSING -------------------------------//
+// -parsecmd ( ps, es)
+// -parsepipe --> parseexec --> parseredir
+// -addng null terminator to thr tree recursivly
+
+
+//====================================Execution====================================//
+
+// 1) get the tree root node
+
+// 2) run the tree recursivle
+
+// -------------------------------FUNC EXECtion -------------------------------//
+// - pipe -> fd[2] -> pipe(fd) -> redirect the output of left_subtree to became input of right_subtree
+// - redir : close fd of redir struct nd open the file of struct; then call runcmd(redircmd->subcmd)
+// - exec : execve
+
 
 // Parsed command representation
 #define EXEC  1
@@ -105,7 +131,7 @@ char	symbols[] = "<|>";
 
 int	get_next_token(char **ps, char *es, char **q, char **eq)
 {
-	int		tok;
+	int		token;
 	char	*s;
 
 	s = *ps;
@@ -113,25 +139,36 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 		s++;
 	if (q)
 		*q = s;
-	tok = *s;
-	if (tok == '\0')
-		tok = 0;
-	else if (tok == '|')
+	token = *s;
+	if (token == '\0')
+	{
+		token = '\0';
+	}
+	else if (token == '|')
+	{
 		s++;
-	else if (tok == '>')
+	}
+	else if (token == '>')
 	{
 		s++;
 		if (*s == '>')
 		{
-			tok = '+';
+			token = '+';
 			s++;
 		}
 	}
-	else if (tok == '<')
+	else if (token == '<')
+	{
 		s++;
+		// if (token == '<')
+		// {
+		// 	token = '#';
+		// 	s++;
+		// }
+	}
 	else
 	{
-		tok = 'a';
+		token = 'a';
 		while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
 			s++;
 	}
@@ -140,69 +177,118 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 	while (s < es && ft_strchr(whitespaces, *s))
 		s++;
 	*ps = s;
-	return (tok);
+	return (token);
 }
 
-int	peek(char **ps, char *es, char *tok)
+int	peek(char **ps, char *es, char *tokens)
 {
-	char	*s;
+	char *s;
 
 	s = *ps;
 	while (s < es && ft_strchr(whitespaces, *s))
 		s++;
 	*ps = s;
-	return (*s && ft_strchr(tok, *s));
+	
+	return (*s && ft_strchr(tokens, *s));
 }
 
-t_cmd	*parseexec(char **ps, char *es);
-t_cmd	*parseredir(t_cmd *subcmd, char **ps, char *es);
+t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es);
+t_cmd *parse_pipe(char **ps, char *es);
+t_cmd	*null_terminator(t_cmd *cmd);
+t_cmd	*parse_exec(char **ps, char *es);
 
-t_cmd	*parsepipe(char **ps, char *es)
+t_cmd *parse_cmd(char *buf)
 {
+	char	*ps;
+	char	*es;
 	t_cmd	*cmd;
 
-	cmd = parseexec(ps, es);
-	if (peek(ps, es, "|"))
-	{
-		get_next_token(ps, es, 0, 0);
-		cmd = pipecmd(cmd, parsepipe(ps, es));
-	}
+	ps  = buf;
+	es = ps + ft_strlen(ps);
+	cmd = parse_pipe(&ps, es);
+	peek(&ps, es, "");
+	if (ps != es)
+		panic("Syntax Error");
+	null_terminator(cmd);
 	return (cmd);
 }
 
-t_cmd	*parseexec(char **ps, char *es)
+t_cmd	*null_terminator(t_cmd *cmd)
 {
-	t_cmd		*ret;
-	t_execcmd	*cmd;
+	t_execcmd	*ecmd;
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
+	int			i;
+
+	if (cmd->type == EXEC)
+	{
+		i = 0;
+		ecmd = (t_execcmd *)cmd;
+		while (ecmd->eargs[i])
+		{
+			*ecmd->eargs[i] = '\0';
+			i++;
+		}
+	}
+	else if (cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		*rcmd->efile = '\0';
+		null_terminator(rcmd->subcmd);
+	}
+	else if (cmd->type == PIPE)
+	{
+		pcmd = (t_pipecmd *)cmd;
+		null_terminator(pcmd->left);
+		null_terminator(pcmd->right);
+	}
+	return(cmd);
+}
+
+t_cmd *parse_pipe(char **ps, char *es)
+{
+	t_cmd *cmd;
+	
+	cmd = parse_exec(ps, es);
+	if (peek(ps, es, "|"))
+	{
+		get_next_token(ps, es, 0, 0);
+		cmd = pipecmd(cmd, parse_pipe(ps, es));
+	}	
+	return (cmd);
+}
+
+t_cmd	*parse_exec(char **ps, char *es)
+{
+	t_cmd		*cmd;
+	t_execcmd	*exec_cmd;
 	char		*q;
 	char		*eq;
 	int			argc;
-	int			tok;
-
-	ret = execcmd();
-	cmd = (t_execcmd *)ret;
-	ret = parseredir(ret, ps, es);
+	int			token;
+	
 	argc = 0;
+	cmd = execcmd();
+	exec_cmd = (t_execcmd *)cmd;
+	cmd = parse_redir(cmd, ps, es);
 	while (!peek(ps, es, "|"))
 	{
-		tok = get_next_token(ps, es, &q, &eq);
-		if (tok == '\0')
-			break;
-		else if (tok != 'a')
+		token = get_next_token(ps, es, &q, &eq);
+		if (token == '\0')
+			break ;
+		else if (token != 'a')
 			panic("Syntax Error");
-		cmd->args[argc] = q;
-		cmd->eargs[argc] = eq;
+		exec_cmd->args[argc] = q;
+		exec_cmd->eargs[argc] = eq;
 		argc++;
-		if (argc >= 9)
-			panic("Too many arguments");
-		ret = parseredir(ret, ps, es);
+		cmd = parse_redir(cmd, ps, es);
 	}
-	cmd->args[argc] = NULL;
-	cmd->eargs[argc] = NULL;
-	return (ret);
+	exec_cmd->args[argc] = NULL;
+	exec_cmd->eargs[argc] = NULL;
+	return (cmd);
 }
 
-t_cmd	*parseredir(t_cmd *subcmd, char **ps, char *es)
+t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 {
 	char	*q;
 	char	*eq;
@@ -214,119 +300,123 @@ t_cmd	*parseredir(t_cmd *subcmd, char **ps, char *es)
 	{
 		tok = get_next_token(ps, es, 0, 0);
 		if (get_next_token(ps, es, &q, &eq) != 'a')
-		{
-			panic("Syntax error : Missing file name after redirection");
-		}
+			panic("Syntx Error");
 		if (tok == '<')
-			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_RDONLY, 0);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0);
 		else if (tok == '>')
-			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
 		else if (tok == '+')
-			cmd = redircmd(parseredir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
 	}
 	return (cmd);
 }
 
-t_cmd	*nullterminate(t_cmd *cmd)
-{
-	t_pipecmd	*pcmd;
-	t_execcmd	*ecmd;
-	t_redircmd	*rcmd;
-
-	if (cmd->type == PIPE)
-	{
-		pcmd = (t_pipecmd *)cmd;
-		nullterminate(pcmd->left);
-		nullterminate(pcmd->right);
-	}
-	else if (cmd->type == REDIR)
-	{
-		rcmd = (t_redircmd *)cmd;
-		nullterminate(rcmd->subcmd);
-		*rcmd->efile = '\0';
-	}
-	else if (cmd->type == EXEC)
-	{
-		ecmd = (t_execcmd *)cmd;
-		int i = 0;
-		while (ecmd->args[i])
-		{
-			*ecmd->eargs[i] = '\0';
-			i++;
-		}
-	}
-	return (cmd);
-}
-
-t_cmd	*parsecmd(char *buff)
-{
-	char	*ps;
-	char	*es;
-	t_cmd	*cmd;
-
-	ps = buff;
-	es = ps + ft_strlen(ps);
-	cmd = parsepipe(&ps, es);
-	peek(&ps, es, "");
-	if(ps != es){
-		panic("syntax");
-	}
-	cmd = nullterminate(cmd);
-	return (cmd);
-}
 
 void	display_tree(t_cmd *cmd)
 {
-	t_pipecmd	*pcmd;
 	t_execcmd	*ecmd;
 	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
 
 	if (cmd->type == PIPE)
 	{
 		pcmd = (t_pipecmd *)cmd;
-		printf("\n\n=======PIPE======\n\n");
-		printf("\n\n=======PIPE LEFT======\n");
+		printf("=======PIPE======\n\n");
+		printf("=======Pipe Left======\n");
 		display_tree(pcmd->left);
-		printf("\n\n=======PIPE RIGHT======\n");
+		printf("=======Pipe Right======\n");
 		display_tree(pcmd->right);
 	}
 	else if (cmd->type == REDIR)
 	{
 		rcmd = (t_redircmd *)cmd;
-		printf("=======REDIR========\n");
-		printf("file :%s\n", rcmd->file);
+		printf("=======REDIR======\n");
+		printf("The file is : %s\n", rcmd->file);
 		printf("The fd is : %d\n", rcmd->fd);
-		printf("subcmd is : \n");
+		printf("My subcmd is : \n");
 		display_tree(rcmd->subcmd);
 	}
 	else if (cmd->type == EXEC)
 	{
 		ecmd = (t_execcmd *)cmd;
-		printf("========EXEC=======\n");
+		printf("=========EXEC=======\n");
 		printf("The command is : ");
 		for (int i = 0; ecmd->args[i]; i++)
+		{
 			printf("%s ", ecmd->args[i]);
+		}
 		printf("\n\n");
 	}
+}
+
+void	run_cmd(t_cmd *cmd)
+{
+	int	fd[2];
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
+	t_execcmd	*ecmd;
+
+	if (cmd->type == PIPE)
+	{
+		pcmd = (t_pipecmd *)cmd;
+		pipe(fd);
+		if (forking() == 0)
+		{
+			close(fd[0]);
+			dup2(fd[1], 1);
+			close(fd[1]);
+			run_cmd(pcmd->left);
+		}
+		if (forking() == 0)
+		{
+			close(fd[1]);
+			dup2(fd[0], 0);
+			close(fd[0]);
+			run_cmd(pcmd->right);
+		}
+		close(fd[0]);
+		close(fd[1]);
+		wait(NULL);
+		wait(NULL);
+	}
+	else if(cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		close(rcmd->fd);
+		if (open(rcmd->file, rcmd->mod, 0644) < 0)
+		{
+			panic("open");
+			exit(1);
+		}
+		run_cmd(rcmd->subcmd);
+	}
+	else if (cmd->type == EXEC)
+	{
+		ecmd = (t_execcmd *)cmd;
+		execvp(ecmd->args[0], ecmd->args);
+	}
+	exit(0);
 }
 
 // int main(int argc, char **argv, char **envp)
 int main()
 {
-    char    *buff;
+    char    *buf;
+	t_cmd	*main_tree;
     
     while (1)
     {
         ft_printf("minishell$ ");
-        buff = get_next_line(0);
-        if (ft_strlen(buff) == 0 || !buff)
+        buf = get_next_line(0);
+        if (ft_strlen(buf) == 0 || !buf)
             continue;
         if(forking() == 0)
         {
-            display_tree(parsecmd(buff));
+            main_tree = parse_cmd(buf);
+			run_cmd(main_tree);
         }
         wait(0);
-		free(buff);
+		free(buf);
         
     }
     exit(0);
