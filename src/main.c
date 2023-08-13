@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/12 20:28:55 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/13 09:23:12 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,48 +260,41 @@ t_cmd *parse_pipe(char **ps, char *es)
 
 t_cmd	*parse_exec(char **ps, char *es)
 {
+	t_execcmd	*ecmd;
 	t_cmd		*cmd;
-	t_execcmd	*exec_cmd;
+	t_cmd		*tmp;
+	int			tok;
 	char		*q;
 	char		*eq;
 	int			argc;
-	int			token;
-	t_cmd		*ret;
-	
+
 	argc = 0;
 	cmd = execcmd();
-	exec_cmd = (t_execcmd *)cmd;
+	ecmd = (t_execcmd *)cmd;
 	cmd = parse_redir(cmd, ps, es);
-	ret = cmd;
 	while (!peek(ps, es, "|"))
 	{
-		token = get_next_token(ps, es, &q, &eq);
-		if (token == '\0')
-			break ;
-		else if (token != 'a')
+		tok = get_next_token(ps, es, &q, &eq);
+		if (tok == '\0')
+			break;
+		if (tok != 'a')
 			panic("Syntax Error");
-		exec_cmd->args[argc] = q;
-		exec_cmd->eargs[argc] = eq;
-		argc++;
-		// cmd = parse_redir(cmd, ps, es);
-		if (cmd->type == REDIR)
+		ecmd->args[argc] = q;
+		ecmd->eargs[argc] = eq;
+		tmp = cmd;
+		if (cmd != (t_cmd *)ecmd)
 		{
-			if (peek(ps, es, "<>"))
-			{
-				ft_printf("#######REDIR#####\n");
-				((t_redircmd *)cmd)->subcmd = parse_redir((t_cmd *)exec_cmd, ps, es);
-				cmd = ((t_redircmd *)cmd)->subcmd;
-			}
+			while (((t_redircmd *)tmp)->subcmd->type == REDIR)
+				tmp = ((t_redircmd *)tmp)->subcmd;
+			((t_redircmd *)tmp)->subcmd = parse_redir((t_cmd *)ecmd, ps, es);
 		}
-		else if (cmd->type == EXEC)
-		{
+		else
 			cmd = parse_redir(cmd, ps, es);
-			ret = cmd;
-		}
+		argc++;
 	}
-	exec_cmd->args[argc] = NULL;
-	exec_cmd->eargs[argc] = NULL;
-	return (ret);
+	ecmd->args[argc] = NULL;
+	ecmd->eargs[argc] = NULL;
+	return (cmd);
 }
 
 t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
@@ -316,7 +309,7 @@ t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 	{
 		tok = get_next_token(ps, es, 0, 0);
 		if (get_next_token(ps, es, &q, &eq) != 'a')
-			panic("Syntx Error");
+			panic("Syntax Error: Missing file for redirection");
 		if (tok == '<')
 			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0);
 		else if (tok == '>')
