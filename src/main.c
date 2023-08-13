@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 13:55:53 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/13 17:37:44 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,24 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 			token = '%';
 			s++;
 		}
+	}
+	else if (token == '\'')
+	{
+		token = 'a';
+		s++;
+		while (s < es && *s != '\'')
+			s++;
+		if (s < es)
+			s++;
+	}
+	else if (token == '\"')
+	{
+		token = 'a';
+		s++;
+		while (s < es && *s != '\"')
+			s++;
+		if (s < es)
+			s++;
 	}
 	else
 	{
@@ -474,7 +492,6 @@ void	run_cmd(t_cmd *cmd)
 				exit(1);
 			}
 		}
-		
 		run_cmd(rcmd->subcmd);
 	}
 	else if (cmd->type == EXEC)
@@ -482,8 +499,15 @@ void	run_cmd(t_cmd *cmd)
 		ecmd = (t_execcmd *)cmd;
 		if (ecmd->args[0] == NULL)
 			exit(0);
-		execvp(ecmd->args[0], ecmd->args);
-		panic("execvp");
+		if (strcmp(ecmd->args[0], "echo") == 0)
+		{
+			echo(ecmd->args);
+		}
+		else
+		{
+			execvp(ecmd->args[0], ecmd->args);
+			panic("execvp");
+		}
 	}
 	exit(0);
 }

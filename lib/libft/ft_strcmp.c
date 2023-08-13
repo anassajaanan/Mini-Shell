@@ -1,27 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 17:10:59 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/13 16:58:44 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/13 17:04:52 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-#include <errno.h>
+#include "libft.h"
 
-#include "../lib/libft/libft.h"
-#include "../lib/get_next_line/get_next_line.h"
-#include "../lib/ft_printf/ft_printf.h"
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	int	i;
 
-#define TEMP_FILE_NAME "/tmp/minishell_temp"
-
-
-void	echo(char **argv);
+	i = 0;
+	while (s1[i] && s2[i] && s1[i] == s2[i])
+		i++;
+	return (s1[i] - s2[i]);
+}
