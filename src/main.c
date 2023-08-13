@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 09:23:12 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/13 13:16:01 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ typedef struct s_redircmd
 	int		fd;
 	int		mod;
 	t_cmd	*subcmd;
+	int		redirection_type;
 }			t_redircmd;
 
 t_cmd	*pipecmd(t_cmd *left, t_cmd *right)
@@ -96,7 +97,7 @@ t_cmd   *execcmd(void)
     return ((t_cmd *)cmd);
 }
 
-t_cmd   *redircmd(t_cmd *subcmd, char *file, char *efile, int mod, int fd)
+t_cmd   *redircmd(t_cmd *subcmd, char *file, char *efile, int mod, int fd, int redirection_type)
 {
     t_redircmd  *cmd;
 
@@ -107,6 +108,7 @@ t_cmd   *redircmd(t_cmd *subcmd, char *file, char *efile, int mod, int fd)
     cmd->mod = mod;
     cmd->fd = fd;
     cmd->subcmd = subcmd;
+	cmd->redirection_type = redirection_type;
     return ((t_cmd *)cmd);
 }
 
@@ -160,11 +162,11 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 	else if (token == '<')
 	{
 		s++;
-		// if (token == '<')
-		// {
-		// 	token = '#';
-		// 	s++;
-		// }
+		if (*s == '<')
+		{
+			token = '%';
+			s++;
+		}
 	}
 	else
 	{
@@ -281,6 +283,9 @@ t_cmd	*parse_exec(char **ps, char *es)
 			panic("Syntax Error");
 		ecmd->args[argc] = q;
 		ecmd->eargs[argc] = eq;
+		argc++;
+		if(argc >= MAXARGS - 1)
+      		panic("too many args");
 		tmp = cmd;
 		if (cmd != (t_cmd *)ecmd)
 		{
@@ -290,7 +295,6 @@ t_cmd	*parse_exec(char **ps, char *es)
 		}
 		else
 			cmd = parse_redir(cmd, ps, es);
-		argc++;
 	}
 	ecmd->args[argc] = NULL;
 	ecmd->eargs[argc] = NULL;
@@ -311,11 +315,13 @@ t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 		if (get_next_token(ps, es, &q, &eq) != 'a')
 			panic("Syntax Error: Missing file for redirection");
 		if (tok == '<')
-			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0, '<');
 		else if (tok == '>')
-			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_TRUNC, 1, '>');
 		else if (tok == '+')
-			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_APPEND, 1);
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_WRONLY | O_CREAT | O_APPEND, 1, '+');
+		else if (tok == '%')
+			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0, '%');
 	}
 	return (cmd);
 }
@@ -342,6 +348,7 @@ void	display_tree(t_cmd *cmd)
 		printf("=======REDIR======\n");
 		printf("The file is : %s\n", rcmd->file);
 		printf("The fd is : %d\n", rcmd->fd);
+		printf("The redir is : %c\n", rcmd->redirection_type);
 		printf("My subcmd is : \n");
 		display_tree(rcmd->subcmd);
 	}
@@ -356,6 +363,59 @@ void	display_tree(t_cmd *cmd)
 		}
 		printf("\n\n");
 	}
+}
+
+char *read_input_until_delimiter(const char *delimiter)
+{
+	char	*line;
+	int		buffer_len;
+    char	*input_buffer;
+
+	buffer_len = 0;
+	input_buffer = (char *)malloc(sizeof(char) * 1024);
+	if (!input_buffer)
+	{
+		panic("malloc");
+		exit(1);
+	}
+	int terminal_fd = open("/dev/tty", O_RDONLY); // Open terminal for reading
+
+    // ... (other code)
+
+    // Redirect stdin to the terminal
+    dup2(terminal_fd, 0); // Duplicate terminal_fd to file descriptor 0 (stdin)
+    close(terminal_fd);
+	while (1)
+	{
+		ft_printf("> ");
+		line = get_next_line(0);
+		if (ft_strlen(line) == ft_strlen(delimiter) + 1 &&
+			ft_strncmp(line, delimiter, ft_strlen(line) - 1) == 0)
+			break;
+		ft_strlcpy(input_buffer + buffer_len, line, ft_strlen(line) + 1);
+		buffer_len += ft_strlen(line);
+		free(line);
+	}
+	free(line);
+	return (input_buffer);
+}
+
+void	write_input_to_temp_file(char *input, char *filename)
+{
+	int	fd;
+
+	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0)
+	{
+		panic("open");
+		exit(1);
+	}
+	if (write(fd, input, ft_strlen(input)) < 0)
+	{
+		panic("write");
+		exit(1);
+	}
+	close(fd);
 }
 
 void	run_cmd(t_cmd *cmd)
@@ -391,18 +451,39 @@ void	run_cmd(t_cmd *cmd)
 	else if(cmd->type == REDIR)
 	{
 		rcmd = (t_redircmd *)cmd;
-		close(rcmd->fd);
-		if (open(rcmd->file, rcmd->mod, 0644) < 0)
+		if (rcmd->redirection_type != '%')
 		{
-			panic("open");
-			exit(1);
+			close(rcmd->fd);
+			if (open(rcmd->file, rcmd->mod, 0644) < 0)
+			{
+				panic("open");
+				exit(1);
+			}
 		}
+		else
+		{
+			char *input;
+
+			input = read_input_until_delimiter(rcmd->file);
+			write_input_to_temp_file(input, "temp");
+			free(input);
+			close(rcmd->fd);
+			if (open("temp", rcmd->mod, 0644) < 0)
+			{
+				panic("open");
+				exit(1);
+			}
+		}
+		
 		run_cmd(rcmd->subcmd);
 	}
 	else if (cmd->type == EXEC)
 	{
 		ecmd = (t_execcmd *)cmd;
+		if (ecmd->args[0] == NULL)
+			exit(0);
 		execvp(ecmd->args[0], ecmd->args);
+		panic("execvp");
 	}
 	exit(0);
 }
@@ -422,8 +503,8 @@ int main()
         if(forking() == 0)
         {
             main_tree = parse_cmd(buf);
-			display_tree(main_tree);
-			// run_cmd(main_tree);
+			// display_tree(main_tree);
+			run_cmd(main_tree);
         }
         wait(0);
 		free(buf);
