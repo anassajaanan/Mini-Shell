@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/11 18:20:11 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/13 13:52:34 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,3 +20,5 @@
 #include "../lib/libft/libft.h"
 #include "../lib/get_next_line/get_next_line.h"
 #include "../lib/ft_printf/ft_printf.h"
+
+#define TEMP_FILE_NAME "/tmp/minishell_temp"

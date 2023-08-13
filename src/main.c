@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 13:16:01 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/13 13:55:53 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -400,11 +400,11 @@ char *read_input_until_delimiter(const char *delimiter)
 	return (input_buffer);
 }
 
-void	write_input_to_temp_file(char *input, char *filename)
+void	write_input_to_temp_file(char *input)
 {
 	int	fd;
 
-	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = open(TEMP_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
 	{
 		panic("open");
@@ -465,10 +465,10 @@ void	run_cmd(t_cmd *cmd)
 			char *input;
 
 			input = read_input_until_delimiter(rcmd->file);
-			write_input_to_temp_file(input, "temp");
+			write_input_to_temp_file(input);
 			free(input);
 			close(rcmd->fd);
-			if (open("temp", rcmd->mod, 0644) < 0)
+			if (open(TEMP_FILE_NAME, rcmd->mod, 0644) < 0)
 			{
 				panic("open");
 				exit(1);
@@ -508,7 +508,7 @@ int main()
         }
         wait(0);
 		free(buf);
-        
+        unlink(TEMP_FILE_NAME);
     }
     exit(0);
 }
