@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 17:22:01 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/14 18:15:23 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -520,10 +520,40 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 	exit(0);
 }
 
+
+void	free_tree(t_cmd *cmd)
+{
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
+	t_execcmd	*ecmd;
+
+	if (cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		free_tree(rcmd->subcmd);
+		if (rcmd)
+			free(rcmd);
+	}
+	else if (cmd->type == PIPE)
+	{
+		pcmd = (t_pipecmd *)cmd;
+		free_tree(pcmd->left);
+		free_tree(pcmd->right);
+		if (pcmd)
+			free(pcmd);
+	}
+	else if (cmd->type == EXEC)
+	{
+		ecmd = (t_execcmd *)cmd;
+		if (ecmd)
+			free(ecmd);
+	}
+}
+
 int main(int argc, char **argv, char **envp)
 {
     char    *buf;
-	t_cmd	*main_tree;
+	t_cmd	*main_tree = NULL;
 	t_env_var	*env_var_list;
 	(void)argc;
 	(void)argv;
@@ -535,32 +565,33 @@ int main(int argc, char **argv, char **envp)
         buf = get_next_line(0);
         if (ft_strlen(buf) == 0 || !buf)
             continue;
+		main_tree = parse_cmd(buf);
+		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+		{
+			free(buf);
+			free_tree(main_tree);
+			ft_printf("exit\n");
+			break;
+		}
+		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
+			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list);
+		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
+			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list);
 		else
 		{
-			main_tree = parse_cmd(buf);
-			
-			if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+			if(forking() == 0)
 			{
-				ft_printf("exit\n");
-				break;
+				// display_tree(main_tree);
+				run_cmd(main_tree, &env_var_list);
 			}
-			else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
-				handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list);
-			else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
-				unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list);
-			else
-			{
-				if(forking() == 0)
-				{
-					// display_tree(main_tree);
-					run_cmd(main_tree, &env_var_list);
-				}
-				wait(0);
-				free(buf);
-				unlink(TEMP_FILE_NAME);
-			}
-			
+			wait(0);
+			free(buf);
+			unlink(TEMP_FILE_NAME);
 		}
+		if (main_tree)
+			free_tree(main_tree);
+		free(buf);
     }
+	free_env_var_list(env_var_list);
     exit(0);
 }
