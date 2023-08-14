@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 17:37:44 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/14 17:22:01 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -396,16 +396,16 @@ char *read_input_until_delimiter(const char *delimiter)
 		panic("malloc");
 		exit(1);
 	}
-	int terminal_fd = open("/dev/tty", O_RDONLY); // Open terminal for reading
-
-    // ... (other code)
-
-    // Redirect stdin to the terminal
-    dup2(terminal_fd, 0); // Duplicate terminal_fd to file descriptor 0 (stdin)
+	
+	int terminal_fd = open("/dev/tty", O_RDONLY);
+    dup2(terminal_fd, 0);
     close(terminal_fd);
+
+	int terminal_fd1 = open("/dev/tty", O_WRONLY);
+
 	while (1)
 	{
-		ft_printf("> ");
+		ft_putstr_fd("> ", terminal_fd1);
 		line = get_next_line(0);
 		if (ft_strlen(line) == ft_strlen(delimiter) + 1 &&
 			ft_strncmp(line, delimiter, ft_strlen(line) - 1) == 0)
@@ -415,6 +415,7 @@ char *read_input_until_delimiter(const char *delimiter)
 		free(line);
 	}
 	free(line);
+	close(terminal_fd1);
 	return (input_buffer);
 }
 
@@ -436,7 +437,7 @@ void	write_input_to_temp_file(char *input)
 	close(fd);
 }
 
-void	run_cmd(t_cmd *cmd)
+void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 {
 	int	fd[2];
 	t_redircmd	*rcmd;
@@ -452,14 +453,14 @@ void	run_cmd(t_cmd *cmd)
 			close(fd[0]);
 			dup2(fd[1], 1);
 			close(fd[1]);
-			run_cmd(pcmd->left);
+			run_cmd(pcmd->left, env_var_list);
 		}
 		if (forking() == 0)
 		{
 			close(fd[1]);
 			dup2(fd[0], 0);
 			close(fd[0]);
-			run_cmd(pcmd->right);
+			run_cmd(pcmd->right, env_var_list);
 		}
 		close(fd[0]);
 		close(fd[1]);
@@ -468,6 +469,7 @@ void	run_cmd(t_cmd *cmd)
 	}
 	else if(cmd->type == REDIR)
 	{
+		
 		rcmd = (t_redircmd *)cmd;
 		if (rcmd->redirection_type != '%')
 		{
@@ -481,7 +483,6 @@ void	run_cmd(t_cmd *cmd)
 		else
 		{
 			char *input;
-
 			input = read_input_until_delimiter(rcmd->file);
 			write_input_to_temp_file(input);
 			free(input);
@@ -492,7 +493,7 @@ void	run_cmd(t_cmd *cmd)
 				exit(1);
 			}
 		}
-		run_cmd(rcmd->subcmd);
+		run_cmd(rcmd->subcmd, env_var_list);
 	}
 	else if (cmd->type == EXEC)
 	{
@@ -500,8 +501,15 @@ void	run_cmd(t_cmd *cmd)
 		if (ecmd->args[0] == NULL)
 			exit(0);
 		if (strcmp(ecmd->args[0], "echo") == 0)
-		{
 			echo(ecmd->args);
+		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
+			env(env_var_list);
+		else if (ft_strcmp(ecmd->args[0], "export") == 0)
+			export(ecmd->args, *env_var_list);
+		else if (ft_strcmp(ecmd->args[0], "unset") == 0)
+		{
+			//just pass condition
+			return;
 		}
 		else
 		{
@@ -512,27 +520,47 @@ void	run_cmd(t_cmd *cmd)
 	exit(0);
 }
 
-// int main(int argc, char **argv, char **envp)
-int main()
+int main(int argc, char **argv, char **envp)
 {
     char    *buf;
 	t_cmd	*main_tree;
-    
+	t_env_var	*env_var_list;
+	(void)argc;
+	(void)argv;
+	env_var_list = NULL; 
+	copy_env_to_list(envp, &env_var_list);
     while (1)
     {
         ft_printf("minishell$ ");
         buf = get_next_line(0);
         if (ft_strlen(buf) == 0 || !buf)
             continue;
-        if(forking() == 0)
-        {
-            main_tree = parse_cmd(buf);
-			// display_tree(main_tree);
-			run_cmd(main_tree);
-        }
-        wait(0);
-		free(buf);
-        unlink(TEMP_FILE_NAME);
+		else
+		{
+			main_tree = parse_cmd(buf);
+			
+			if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+			{
+				ft_printf("exit\n");
+				break;
+			}
+			else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
+				handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list);
+			else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
+				unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list);
+			else
+			{
+				if(forking() == 0)
+				{
+					// display_tree(main_tree);
+					run_cmd(main_tree, &env_var_list);
+				}
+				wait(0);
+				free(buf);
+				unlink(TEMP_FILE_NAME);
+			}
+			
+		}
     }
     exit(0);
 }
