@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 18:15:23 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/14 18:22:29 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -585,7 +585,6 @@ int main(int argc, char **argv, char **envp)
 				run_cmd(main_tree, &env_var_list);
 			}
 			wait(0);
-			free(buf);
 			unlink(TEMP_FILE_NAME);
 		}
 		if (main_tree)
