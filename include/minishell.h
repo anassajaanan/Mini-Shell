@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 17:33:32 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/15 15:17:06 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "../lib/libft/libft.h"
 #include "../lib/get_next_line/get_next_line.h"
@@ -69,13 +66,9 @@ void		free_env_var_list(t_env_var *env_var_list);
 // =================== echo.c ======================//
 void	echo(char **argv);
 
-// =================== env.c ======================//
 void	env(t_env_var **env_var_list);
 
-// =================== unset.c ======================//
-void	unset_env_var(char **args, t_env_var **env_var_list);
 
-// =================== utils.c ======================//
 void	free_args(char **args);
 
 // =================== export.c ======================//
@@ -83,6 +76,6 @@ void	print_environment_variables(t_env_var *env_var_list);
 void	export(char **args, t_env_var *env_var_list);
 void	handle_export_command(char **args, t_env_var **env_var_list);
 
-
+void	cd(char **args);
 
 void	unset_env_var(char **args, t_env_var **env_var_list);

@@ -1,28 +1,27 @@
 NAME = minishell
 
-SRCS = ./src/main.c \
-		./src/echo.c \
-		./src/env.c \
-		./src/unset.c \
-		./src/export.c \
-		./src/env_var.c \
-		./src/queue.c \
-		./src/utils.c \
-		./lib/get_next_line/get_next_line.c \
-		./lib/get_next_line/get_next_line_utils.c \
+SRCS =	src/main.c \
+		src/echo.c \
+		src/env.c \
+		src/cd.c \
+		src/export.c \
+		src/env_var.c \
+		src/queue.c \
+		src/utils.c \
+		lib/get_next_line/get_next_line.c \
+		lib/get_next_line/get_next_line_utils.c \
 
 OBJS = $(SRCS:.c=.o)
 
-INCLUDE = ./include
+INCLUDE = ./include/
 
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror -g -I $(INCLUDE)
 
 
 ${NAME}: ${OBJS}
 	@make -C ./lib/libft
 	@make -C ./lib/ft_printf
-	# ${CC} ${CFLAGS} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
-	${CC} ${CFLAGS} -I ${INCLUDE} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
+	${CC} ${CFLAGS} -L./lib/libft -lft -L./lib/ft_printf -lftprintf -o ${NAME} ${OBJS}
 
 all: ${NAME}
 

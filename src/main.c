@@ -6,12 +6,11 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 18:22:29 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/15 15:19:14 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
 //====================================PARSING=====================================//
 
 // 1) Parse command line
@@ -116,6 +115,12 @@ void    panic(char *s)
 {
 	perror(s);
 	exit(1);
+}
+
+void	panic_exit(int status, char	*s)
+{
+	perror(s);
+	exit(status);
 }
 
 int forking()
@@ -448,24 +453,47 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 	{
 		pcmd = (t_pipecmd *)cmd;
 		pipe(fd);
-		if (forking() == 0)
+		int pid1;
+		int pid2;
+		if ((pid1 = forking()) == 0)
 		{
 			close(fd[0]);
 			dup2(fd[1], 1);
 			close(fd[1]);
 			run_cmd(pcmd->left, env_var_list);
 		}
-		if (forking() == 0)
+		if ((pid2 = forking()) == 0)
 		{
 			close(fd[1]);
 			dup2(fd[0], 0);
 			close(fd[0]);
 			run_cmd(pcmd->right, env_var_list);
 		}
+		
 		close(fd[0]);
 		close(fd[1]);
-		wait(NULL);
-		wait(NULL);
+		waitpid(pid1, NULL, 0);
+		int status;
+		waitpid(pid2, &status, 0);
+		int	exit_status;
+		
+		if (WIFEXITED(status)) {
+			exit_status = WEXITSTATUS(status);
+		} else {
+			exit_status = 1;
+		}
+		int fd = open("temp", O_WRONLY | O_CREAT | O_APPEND, 0777);
+		if (fd < 0)
+		{
+			panic("open");
+			exit(1);
+		}
+		if (write(fd, &exit_status, sizeof(int)) < 0)
+		{
+			panic("write");
+			exit(1);
+		}
+		close(fd);
 	}
 	else if(cmd->type == REDIR)
 	{
@@ -508,52 +536,27 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 			export(ecmd->args, *env_var_list);
 		else if (ft_strcmp(ecmd->args[0], "unset") == 0)
 		{
-			//just pass condition
 			return;
 		}
 		else
 		{
 			execvp(ecmd->args[0], ecmd->args);
-			panic("execvp");
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(ecmd->args[0], 2);
+			ft_putstr_fd(": command not found\n", 2);
+			exit(127);
 		}
 	}
 	exit(0);
 }
 
 
-void	free_tree(t_cmd *cmd)
-{
-	t_redircmd	*rcmd;
-	t_pipecmd	*pcmd;
-	t_execcmd	*ecmd;
-
-	if (cmd->type == REDIR)
-	{
-		rcmd = (t_redircmd *)cmd;
-		free_tree(rcmd->subcmd);
-		if (rcmd)
-			free(rcmd);
-	}
-	else if (cmd->type == PIPE)
-	{
-		pcmd = (t_pipecmd *)cmd;
-		free_tree(pcmd->left);
-		free_tree(pcmd->right);
-		if (pcmd)
-			free(pcmd);
-	}
-	else if (cmd->type == EXEC)
-	{
-		ecmd = (t_execcmd *)cmd;
-		if (ecmd)
-			free(ecmd);
-	}
-}
 
 int main(int argc, char **argv, char **envp)
 {
-    char    *buf;
-	t_cmd	*main_tree = NULL;
+    char    	*buf;
+	t_cmd		*main_tree;
+	int			exit_status;
 	t_env_var	*env_var_list;
 	(void)argc;
 	(void)argv;
@@ -565,11 +568,11 @@ int main(int argc, char **argv, char **envp)
         buf = get_next_line(0);
         if (ft_strlen(buf) == 0 || !buf)
             continue;
+		
 		main_tree = parse_cmd(buf);
+		
 		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
-			free(buf);
-			free_tree(main_tree);
 			ft_printf("exit\n");
 			break;
 		}
@@ -577,6 +580,8 @@ int main(int argc, char **argv, char **envp)
 			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list);
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
 			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list);
+		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
+			cd(((t_execcmd *)main_tree)->args);
 		else
 		{
 			if(forking() == 0)
@@ -584,13 +589,34 @@ int main(int argc, char **argv, char **envp)
 				// display_tree(main_tree);
 				run_cmd(main_tree, &env_var_list);
 			}
-			wait(0);
-			unlink(TEMP_FILE_NAME);
+			int status;
+			wait(&status);
+			if (main_tree && main_tree->type != PIPE)
+			{
+				if (WIFEXITED(status))
+					exit_status = WEXITSTATUS(status);
+				else
+					exit_status = 1; // Default to 1 if the child process didn't exit normally
+				ft_printf("The exist status of main (1 command) is : %d\n", exit_status);
+				free(buf);
+				unlink(TEMP_FILE_NAME);
+			}
+			else
+			{
+				int fd = open("temp", O_RDONLY);
+				if (fd < 0)
+				{
+					panic("open");
+					exit(1);
+				}
+				read(fd, &exit_status, sizeof(int));
+				ft_printf("The exist status of main (multiple commands) is : %d\n", exit_status);
+				free(buf);
+				unlink("temp");
+				unlink(TEMP_FILE_NAME);
+			}
 		}
-		if (main_tree)
-			free_tree(main_tree);
-		free(buf);
+		
     }
-	free_env_var_list(env_var_list);
     exit(0);
 }
