@@ -4,6 +4,7 @@ SRCS =	src/main.c \
 		src/echo.c \
 		src/env.c \
 		src/cd.c \
+		src/unset.c \
 		src/export.c \
 		src/env_var.c \
 		src/queue.c \
