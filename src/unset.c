@@ -6,13 +6,13 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 17:27:02 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 17:31:45 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/16 08:39:55 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	unset_env_var(char **args, t_env_var **env_var_list)
+void	unset_env_var(char **args, t_env_var **env_var_list, int *exit_status)
 {
 	int			i;
 	t_env_var	*p;
@@ -21,6 +21,15 @@ void	unset_env_var(char **args, t_env_var **env_var_list)
 	i = 1;
 	while (args[i])
 	{
+		if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
+		{
+			ft_putstr_fd("minishell: unset: `", 2);
+			ft_putstr_fd(args[i], 2);
+			ft_putstr_fd("': not a valid identifier\n", 2);
+			*exit_status = 1;
+			i++;
+			continue ;
+		}
 		p = *env_var_list;
 		q = NULL;
 		if (strcmp((*env_var_list)->key, args[i]) == 0)
@@ -35,7 +44,10 @@ void	unset_env_var(char **args, t_env_var **env_var_list)
 			p = p->next;
 		}
 		if (p == NULL)
-			return ;
+		{
+			i++;
+			continue;
+		}
 		q->next = p->next;
 		free_env_var_node(p);
 		i++;

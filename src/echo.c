@@ -6,11 +6,35 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 12:01:08 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/16 07:32:34 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+
+void	handle_envirement_variable(char *arg, int exit_status)
+{
+	char	**variables;
+	char	*value;
+	int		i;
+	
+	if (ft_strcmp(arg, "$?") == 0)
+		ft_printf("%d", exit_status);
+	else if (arg[0] == '$')
+	{
+		i = 0;
+		variables = ft_split(arg, '$');
+		while (variables[i])
+		{
+			value = getenv(variables[i]);
+			if (value)
+				ft_printf("%s", value);
+			i++;
+		}
+		free_args(variables);
+	}
+}
 
 void	handle_single_quoted_string(char *str)
 {
@@ -24,35 +48,53 @@ void	handle_single_quoted_string(char *str)
 	}
 }
 
-void	handle_double_quoted_string(char *str)
+void	handle_double_quoted_string(char *str, int exit_status)
 {
 	int	i;
+	int	j;
 
 	i = 1;
 	while (str[i] && str[i] != '\"')
 	{
-		if (str[i] == '$')
+		if (str[i] == '$' && str[i + 1] == '?')
 		{
-			// loop in env variables to find the value of the variable & print it
-			ft_printf("ENV");
-			//do not forget to skip the variable name after printing it
-
-			// ignore the variable if it does not exit and skip it, print it if it exits
-			// we need to have a space after the variable name, otherwise it is not a variable
-			// Example: this is a sample input/output, TERM_PROGRAM is a variable but is ignored because it is not followed by a space
-			/*
-			bash-3.2$ echo "$TERM_PROGRAMcheck"
-
-			bash-3.2$ 
-			*/
+			ft_printf("%d", exit_status);
+			i += 2;
+		}
+		else if (str[i] == '$')
+		{
+			
+			j = ++i;
+			while (!ft_strchr(" $\t\n\v\f\r\"", str[i]))
+				i++;
+			char *var_name = (char *)malloc(sizeof(char) * (i - j + 1));
+			ft_strlcpy(var_name, str + j, i - j + 1);
+			char *value = getenv(var_name);
+			if (value)
+				ft_printf("%s", value);
+			free(var_name);
 		}
 		else
+		{
 			ft_printf("%c", str[i]);
-		i++;
+			i++;
+		}
 	}
 }
 
-void	echo(char **argv)
+void process_argument(char *arg, int exit_status)
+{
+	if (arg[0] == '\'')
+		handle_single_quoted_string(arg);
+	else if (arg[0] == '\"')
+		handle_double_quoted_string(arg, exit_status);
+	else if (arg[0] == '$')
+		handle_envirement_variable(arg, exit_status);
+	else
+		ft_printf("%s", arg);
+}
+
+void	echo(char **argv, int exit_status)
 {
 	int	i;
 	int	new_line;
@@ -66,12 +108,7 @@ void	echo(char **argv)
 	}
 	while (argv[i])
 	{
-		if (argv[i][0] == '\'')
-			handle_single_quoted_string(argv[i]);
-		else if (argv[i][0] == '\"')
-			handle_double_quoted_string(argv[i]);//we need to pass the env variables
-		else
-			ft_printf("%s", argv[i]);
+		process_argument(argv[i], exit_status);
 		if (argv[i + 1])
 			ft_printf(" ");
 		i++;

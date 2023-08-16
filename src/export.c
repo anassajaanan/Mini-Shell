@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 15:52:54 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/16 08:26:32 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	export(char **args, t_env_var *env_var_list)
 	}
 }
 
-void	handle_export_command(char **args, t_env_var **env_var_list)
+void	handle_export_command(char **args, t_env_var **env_var_list, int *exit_status)
 {
 	int			i;
 	char		**key_value;
@@ -51,9 +51,12 @@ void	handle_export_command(char **args, t_env_var **env_var_list)
 	i = 1;
 	while (args[i])
 	{
-		if (ft_isdigit(args[i][0]))
+		if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
 		{
-			ft_printf("minishell: export: `%s': not a valid identifier\n", args[i]);
+			ft_putstr_fd("minishell: export: `", 2);
+			ft_putstr_fd(args[i], 2);
+			ft_putstr_fd("': not a valid identifier\n", 2);
+			*exit_status = 1;
 			i++;
 			continue ;
 		}

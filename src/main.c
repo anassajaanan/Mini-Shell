@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/15 15:19:14 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/16 08:41:28 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -442,7 +442,7 @@ void	write_input_to_temp_file(char *input)
 	close(fd);
 }
 
-void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
+void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 {
 	int	fd[2];
 	t_redircmd	*rcmd;
@@ -460,14 +460,14 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 			close(fd[0]);
 			dup2(fd[1], 1);
 			close(fd[1]);
-			run_cmd(pcmd->left, env_var_list);
+			run_cmd(pcmd->left, env_var_list, exit_status);
 		}
 		if ((pid2 = forking()) == 0)
 		{
 			close(fd[1]);
 			dup2(fd[0], 0);
 			close(fd[0]);
-			run_cmd(pcmd->right, env_var_list);
+			run_cmd(pcmd->right, env_var_list, exit_status);
 		}
 		
 		close(fd[0]);
@@ -521,7 +521,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 				exit(1);
 			}
 		}
-		run_cmd(rcmd->subcmd, env_var_list);
+		run_cmd(rcmd->subcmd, env_var_list, exit_status);
 	}
 	else if (cmd->type == EXEC)
 	{
@@ -529,7 +529,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list)
 		if (ecmd->args[0] == NULL)
 			exit(0);
 		if (strcmp(ecmd->args[0], "echo") == 0)
-			echo(ecmd->args);
+			echo(ecmd->args, exit_status);
 		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
 			env(env_var_list);
 		else if (ft_strcmp(ecmd->args[0], "export") == 0)
@@ -556,7 +556,7 @@ int main(int argc, char **argv, char **envp)
 {
     char    	*buf;
 	t_cmd		*main_tree;
-	int			exit_status;
+	int			exit_status = 0;
 	t_env_var	*env_var_list;
 	(void)argc;
 	(void)argv;
@@ -570,6 +570,7 @@ int main(int argc, char **argv, char **envp)
             continue;
 		
 		main_tree = parse_cmd(buf);
+
 		
 		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
@@ -577,27 +578,27 @@ int main(int argc, char **argv, char **envp)
 			break;
 		}
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
-			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list);
+			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
-			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list);
+			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
-			cd(((t_execcmd *)main_tree)->args);
+			cd(((t_execcmd *)main_tree)->args, &exit_status);
 		else
 		{
 			if(forking() == 0)
 			{
 				// display_tree(main_tree);
-				run_cmd(main_tree, &env_var_list);
+				run_cmd(main_tree, &env_var_list, exit_status);
 			}
 			int status;
 			wait(&status);
-			if (main_tree && main_tree->type != PIPE)
+			if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
 			{
 				if (WIFEXITED(status))
 					exit_status = WEXITSTATUS(status);
 				else
 					exit_status = 1; // Default to 1 if the child process didn't exit normally
-				ft_printf("The exist status of main (1 command) is : %d\n", exit_status);
+				// ft_printf("The exist status of main (1 command) is : %d\n", exit_status);
 				free(buf);
 				unlink(TEMP_FILE_NAME);
 			}
@@ -610,13 +611,12 @@ int main(int argc, char **argv, char **envp)
 					exit(1);
 				}
 				read(fd, &exit_status, sizeof(int));
-				ft_printf("The exist status of main (multiple commands) is : %d\n", exit_status);
+				// ft_printf("The exist status of main (multiple commands) is : %d\n", exit_status);
 				free(buf);
 				unlink("temp");
 				unlink(TEMP_FILE_NAME);
 			}
 		}
-		
     }
     exit(0);
 }
