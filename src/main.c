@@ -6,36 +6,22 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 08:41:28 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/17 20:29:45 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-//====================================PARSING=====================================//
-
-// 1) Parse command line
-
-// 2) Build the tree representation 
-
-// 3) Return the root node of the tree
-
-// -------------------------------FUNC PARSING -------------------------------//
-// -parsecmd ( ps, es)
-// -parsepipe --> parseexec --> parseredir
-// -addng null terminator to thr tree recursivly
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <time.h>
 
 
-//====================================Execution====================================//
-
-// 1) get the tree root node
-
-// 2) run the tree recursivle
+int	g_pid;
 
 // -------------------------------FUNC EXECtion -------------------------------//
 // - pipe -> fd[2] -> pipe(fd) -> redirect the output of left_subtree to became input of right_subtree
 // - redir : close fd of redir struct nd open the file of struct; then call runcmd(redircmd->subcmd)
 // - exec : execve
-
 
 // Parsed command representation
 #define EXEC  1
@@ -525,6 +511,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	}
 	else if (cmd->type == EXEC)
 	{
+		printf("the pid is %d\n", g_pid);
 		ecmd = (t_execcmd *)cmd;
 		if (ecmd->args[0] == NULL)
 			exit(0);
@@ -550,6 +537,40 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	exit(0);
 }
 
+void	signal_handler1(int signum)
+{
+	if (g_pid == 0)
+	{
+		// ft_printf_fd(STDERR_FILENO, "From signal handler 1\n");
+		if (signum == SIGQUIT)
+			ft_printf_fd(STDERR_FILENO, "Quit: %d\n", SIGQUIT);
+		else if (signum == SIGINT)
+			ft_printf_fd(STDERR_FILENO, "\n");
+	}
+}
+
+void	signal_handler(int signum)
+{
+	
+	if (g_pid != 0)
+	{
+		// ft_printf_fd(STDERR_FILENO, "From signal handler 0\n");
+		if (signum == SIGINT)
+		{
+			ft_printf_fd(STDERR_FILENO, "\n");
+			rl_replace_line("", 0);
+			rl_on_new_line();
+			rl_redisplay();
+		}
+		else if (signum == SIGQUIT)
+		{
+			rl_replace_line("", 0);
+			rl_on_new_line();
+			rl_redisplay();
+			ft_putstr_fd("\033[2K\rminishell$ ", 2);
+		}
+	}
+}
 
 
 int main(int argc, char **argv, char **envp)
@@ -560,18 +581,27 @@ int main(int argc, char **argv, char **envp)
 	t_env_var	*env_var_list;
 	(void)argc;
 	(void)argv;
-	env_var_list = NULL; 
+	env_var_list = NULL;
 	copy_env_to_list(envp, &env_var_list);
+    signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+	signal(SIGINT, signal_handler1);
+	signal(SIGQUIT, signal_handler1);
     while (1)
     {
-        ft_printf("minishell$ ");
-        buf = get_next_line(0);
+		g_pid = 1;
+        buf = readline("minishell$ ");
+		if (buf == NULL)
+		{
+			ft_printf("exit\n");
+			break;
+		}
         if (ft_strlen(buf) == 0 || !buf)
             continue;
-		
+
 		main_tree = parse_cmd(buf);
 
-		
+
 		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
 			ft_printf("exit\n");
@@ -587,7 +617,9 @@ int main(int argc, char **argv, char **envp)
 		{
 			if(forking() == 0)
 			{
+				
 				// display_tree(main_tree);
+				g_pid = 0;
 				run_cmd(main_tree, &env_var_list, exit_status);
 			}
 			int status;
@@ -597,8 +629,7 @@ int main(int argc, char **argv, char **envp)
 				if (WIFEXITED(status))
 					exit_status = WEXITSTATUS(status);
 				else
-					exit_status = 1; // Default to 1 if the child process didn't exit normally
-				// ft_printf("The exist status of main (1 command) is : %d\n", exit_status);
+					exit_status = 1;
 				free(buf);
 				unlink(TEMP_FILE_NAME);
 			}
@@ -611,7 +642,6 @@ int main(int argc, char **argv, char **envp)
 					exit(1);
 				}
 				read(fd, &exit_status, sizeof(int));
-				// ft_printf("The exist status of main (multiple commands) is : %d\n", exit_status);
 				free(buf);
 				unlink("temp");
 				unlink(TEMP_FILE_NAME);

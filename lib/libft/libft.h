@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 17:47:13 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/13 17:05:12 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/17 08:11:25 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,23 @@
 # include <unistd.h>
 # include <limits.h>
 # include <stdint.h>
+# include <stdarg.h>
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
+
+struct	s_queue_node_char
+{
+	char				val;
+	struct s_queue_node_char	*next;
+};
+
+typedef struct s_queue_char
+{
+	struct s_queue_node_char	*front;
+	struct s_queue_node_char	*rear;
+}						t_queue_char;
 
 typedef struct s_list
 {
@@ -24,7 +41,8 @@ typedef struct s_list
 	struct s_list	*next;
 }				t_list;
 
-// LIBC FUNCTIONS
+
+/* ================== LIBFT: Part 1 ================== */
 int		ft_atoi(const char *str);
 void	ft_bzero(void *str, size_t num);
 void	*ft_calloc(size_t nbr_elmts, size_t size);
@@ -50,7 +68,7 @@ char	*ft_strrchr(const char *str, int c);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
 
-// Aditional Functions
+/* ================== LIBFT: Part 2 ================== */
 char	*ft_itoa(int n);
 void	ft_putchar_fd(char c, int fd);
 void	ft_putendl_fd(char *s, int fd);
@@ -63,7 +81,7 @@ void	ft_striteri(char *str, void (*f)(unsigned int, char *));
 char	*ft_strtrim(const char *s1, const char *set);
 char	*ft_substr(const char *str, unsigned int start, size_t len);
 
-// Bonus
+/* ================== LIBFT: BONUS ================== */
 int		ft_lstsize(t_list *head);
 t_list	*ft_lstnew(void *content);
 t_list	*ft_lstlast(t_list *head);
@@ -73,5 +91,39 @@ void	ft_lstdelone(t_list *node, void (*del)(void *));
 void	ft_lstclear(t_list **head, void (*del)(void *));
 void	ft_lstiter(t_list *head, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+/* ================== FT_PRINTF ================== */
+void	ft_putchar(char c, int *counter);
+void	ft_puthex(uintptr_t n, char case_type, int *counter);
+void	ft_putnbr(int n, int *counter);
+void	ft_putptr(void *ptr, int *counter);
+void	ft_putstr(char *str, int *counter);
+void	ft_putunbr(unsigned int n, int *counter);
+void	handle_format_specifier(va_list args, char c, int *counter);
+int		ft_printf(const char *format, ...);
+
+/* ================== FT_PRINTF_FD ================== */
+void	putchar_fd(int fd, char c, int *counter);
+void	puthex_fd(int fd, uintptr_t n, char case_type, int *counter);
+void	putnbr_fd(int fd, int n, int *counter);
+void	putptr_fd(int fd, void *ptr, int *counter);
+void	putstr_fd(int fd, char *str, int *counter);
+void	putunbr_fd(int fd, unsigned int n, int *counter);
+void	handle_format_specifier_fd(int fd, va_list args, char c, int *counter);
+int		ft_printf_fd(int fd, const char *format, ...);
+
+/* ================== GET_NEXT_LINE ================== */
+/* QUEUE_CHAR */
+void	init_queue_char(t_queue_char *q);
+void	enqueue_char(t_queue_char *q, char c);
+char	dequeue_char(t_queue_char *q);
+int		queue_char_is_empty(t_queue_char *q);
+
+/* GET_NEXT_LINE */
+int		contains_newline(t_queue_char *q);
+char	*get_line(t_queue_char *q);
+char	*get_last_line(t_queue_char *q);
+char	*handle_bytes(ssize_t bytes, t_queue_char *q, char *buffer, int *fd);
+char	*get_next_line(int fd);
 
 #endif // LIBFT_H

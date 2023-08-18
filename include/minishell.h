@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 08:15:16 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/18 07:38:24 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 #include "../lib/libft/libft.h"
-#include "../lib/get_next_line/get_next_line.h"
-#include "../lib/ft_printf/ft_printf.h"
 
 #include "../include/colors.h"
 
