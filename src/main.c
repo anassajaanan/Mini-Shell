@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/17 20:29:45 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/18 14:20:26 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <time.h>
 
 
-int	g_pid;
 
 // -------------------------------FUNC EXECtion -------------------------------//
 // - pipe -> fd[2] -> pipe(fd) -> redirect the output of left_subtree to became input of right_subtree
@@ -428,6 +427,9 @@ void	write_input_to_temp_file(char *input)
 	close(fd);
 }
 
+
+
+
 void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 {
 	int	fd[2];
@@ -455,7 +457,8 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 			close(fd[0]);
 			run_cmd(pcmd->right, env_var_list, exit_status);
 		}
-		
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
 		close(fd[0]);
 		close(fd[1]);
 		waitpid(pid1, NULL, 0);
@@ -483,7 +486,6 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	}
 	else if(cmd->type == REDIR)
 	{
-		
 		rcmd = (t_redircmd *)cmd;
 		if (rcmd->redirection_type != '%')
 		{
@@ -511,7 +513,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	}
 	else if (cmd->type == EXEC)
 	{
-		printf("the pid is %d\n", g_pid);
+		
 		ecmd = (t_execcmd *)cmd;
 		if (ecmd->args[0] == NULL)
 			exit(0);
@@ -527,6 +529,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		}
 		else
 		{
+			
 			execvp(ecmd->args[0], ecmd->args);
 			ft_putstr_fd("minishell: ", 2);
 			ft_putstr_fd(ecmd->args[0], 2);
@@ -537,41 +540,34 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	exit(0);
 }
 
-void	signal_handler1(int signum)
+
+
+void	norm_sig(int sig)
 {
-	if (g_pid == 0)
-	{
-		// ft_printf_fd(STDERR_FILENO, "From signal handler 1\n");
-		if (signum == SIGQUIT)
-			ft_printf_fd(STDERR_FILENO, "Quit: %d\n", SIGQUIT);
-		else if (signum == SIGINT)
-			ft_printf_fd(STDERR_FILENO, "\n");
-	}
+	if (sig == SIGQUIT)
+		ft_printf_fd(STDERR_FILENO, "Quit: %d\n", SIGQUIT);
+	else if (sig == SIGINT)
+		ft_printf_fd(STDERR_FILENO, "\n");
 }
 
-void	signal_handler(int signum)
+
+static void	sig(int signum)
 {
-	
-	if (g_pid != 0)
+	if (signum == SIGINT)
 	{
-		// ft_printf_fd(STDERR_FILENO, "From signal handler 0\n");
-		if (signum == SIGINT)
-		{
-			ft_printf_fd(STDERR_FILENO, "\n");
-			rl_replace_line("", 0);
-			rl_on_new_line();
-			rl_redisplay();
-		}
-		else if (signum == SIGQUIT)
-		{
-			rl_replace_line("", 0);
-			rl_on_new_line();
-			rl_redisplay();
-			ft_putstr_fd("\033[2K\rminishell$ ", 2);
-		}
+		ft_printf_fd(STDERR_FILENO, "\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+	}
+	else if (signum == SIGQUIT)
+	{
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		ft_putstr_fd("\033[2K\rminishell$ ", 2);
 	}
 }
-
 
 int main(int argc, char **argv, char **envp)
 {
@@ -583,13 +579,13 @@ int main(int argc, char **argv, char **envp)
 	(void)argv;
 	env_var_list = NULL;
 	copy_env_to_list(envp, &env_var_list);
-    signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
-	signal(SIGINT, signal_handler1);
-	signal(SIGQUIT, signal_handler1);
+	
+	
+	
     while (1)
     {
-		g_pid = 1;
+		signal(SIGINT, sig);
+    	signal(SIGQUIT, sig);
         buf = readline("minishell$ ");
 		if (buf == NULL)
 		{
@@ -615,37 +611,39 @@ int main(int argc, char **argv, char **envp)
 			cd(((t_execcmd *)main_tree)->args, &exit_status);
 		else
 		{
+			signal(SIGINT, norm_sig);
+    		signal(SIGQUIT, norm_sig);
 			if(forking() == 0)
 			{
-				
 				// display_tree(main_tree);
-				g_pid = 0;
+				
 				run_cmd(main_tree, &env_var_list, exit_status);
 			}
-			int status;
-			wait(&status);
-			if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
-			{
-				if (WIFEXITED(status))
-					exit_status = WEXITSTATUS(status);
-				else
-					exit_status = 1;
-				free(buf);
-				unlink(TEMP_FILE_NAME);
-			}
-			else
-			{
-				int fd = open("temp", O_RDONLY);
-				if (fd < 0)
-				{
-					panic("open");
-					exit(1);
-				}
-				read(fd, &exit_status, sizeof(int));
-				free(buf);
-				unlink("temp");
-				unlink(TEMP_FILE_NAME);
-			}
+			wait(NULL);
+			// int status;
+			// wait(&status);
+			// if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
+			// {
+			// 	if (WIFEXITED(status))
+			// 		exit_status = WEXITSTATUS(status);
+			// 	else
+			// 		exit_status = 1;
+			// 	free(buf);
+			// 	unlink(TEMP_FILE_NAME);
+			// }
+			// else
+			// {
+			// 	int fd = open("temp", O_RDONLY);
+			// 	if (fd < 0)
+			// 	{
+			// 		panic("open");
+			// 		exit(1);
+			// 	}
+			// 	read(fd, &exit_status, sizeof(int));
+			// 	free(buf);
+			// 	unlink("temp");
+			// 	unlink(TEMP_FILE_NAME);
+			// }
 		}
     }
     exit(0);
