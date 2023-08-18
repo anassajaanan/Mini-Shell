@@ -2,8 +2,14 @@ NAME		=	minishell
 
 CC			=	gcc
 CFLAGS		=	-Wall -Wextra -Werror -g
-LIB_FLAGS	=	-L./lib/libft -lft -L./lib/readline/lib -lreadline
-INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include 
+
+ifeq ($(shell uname -p), i386)
+	LIB_FLAGS	=	-L./lib/libft -lft -L./lib/readline/lib -lreadline
+	INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include
+else
+	LIB_FLAGS	=	-L./lib/libft -lft -lreadline
+	INCLUDES	=	-I./include -I./lib/libft
+endif
 
 SRCS		=	src/main.c \
 				src/echo.c \

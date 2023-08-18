@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/18 14:20:26 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/18 17:21:36 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,12 +373,20 @@ void	display_tree(t_cmd *cmd)
 	}
 }
 
+void	herdoc_handler(int signum)
+{
+	if (signum == SIGINT) {
+		
+	}
+}
+
 char *read_input_until_delimiter(const char *delimiter)
 {
 	char	*line;
 	int		buffer_len;
     char	*input_buffer;
 
+	
 	buffer_len = 0;
 	input_buffer = (char *)malloc(sizeof(char) * 1024);
 	if (!input_buffer)
@@ -457,6 +465,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 			close(fd[0]);
 			run_cmd(pcmd->right, env_var_list, exit_status);
 		}
+		
 		signal(SIGINT, SIG_IGN);
 		signal(SIGQUIT, SIG_IGN);
 		close(fd[0]);
@@ -498,6 +507,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		}
 		else
 		{
+			
 			char *input;
 			input = read_input_until_delimiter(rcmd->file);
 			write_input_to_temp_file(input);
@@ -509,6 +519,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 				exit(1);
 			}
 		}
+		
 		run_cmd(rcmd->subcmd, env_var_list, exit_status);
 	}
 	else if (cmd->type == EXEC)
@@ -555,17 +566,7 @@ static void	sig(int signum)
 {
 	if (signum == SIGINT)
 	{
-		ft_printf_fd(STDERR_FILENO, "\n");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-	}
-	else if (signum == SIGQUIT)
-	{
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		ft_putstr_fd("\033[2K\rminishell$ ", 2);
+		printf("\nminishell$ ");
 	}
 }
 
@@ -585,15 +586,19 @@ int main(int argc, char **argv, char **envp)
     while (1)
     {
 		signal(SIGINT, sig);
-    	signal(SIGQUIT, sig);
-        buf = readline("minishell$ ");
+    	signal(SIGQUIT, SIG_IGN);
+		printf("minishell$ ");
+        buf = readline("");
 		if (buf == NULL)
 		{
 			ft_printf("exit\n");
 			break;
 		}
         if (ft_strlen(buf) == 0 || !buf)
+		{
+			printf("\n");
             continue;
+		}
 
 		main_tree = parse_cmd(buf);
 
@@ -612,38 +617,38 @@ int main(int argc, char **argv, char **envp)
 		else
 		{
 			signal(SIGINT, norm_sig);
-    		signal(SIGQUIT, norm_sig);
+			signal(SIGQUIT, norm_sig);
+			
 			if(forking() == 0)
 			{
 				// display_tree(main_tree);
 				
 				run_cmd(main_tree, &env_var_list, exit_status);
 			}
-			wait(NULL);
-			// int status;
-			// wait(&status);
-			// if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
-			// {
-			// 	if (WIFEXITED(status))
-			// 		exit_status = WEXITSTATUS(status);
-			// 	else
-			// 		exit_status = 1;
-			// 	free(buf);
-			// 	unlink(TEMP_FILE_NAME);
-			// }
-			// else
-			// {
-			// 	int fd = open("temp", O_RDONLY);
-			// 	if (fd < 0)
-			// 	{
-			// 		panic("open");
-			// 		exit(1);
-			// 	}
-			// 	read(fd, &exit_status, sizeof(int));
-			// 	free(buf);
-			// 	unlink("temp");
-			// 	unlink(TEMP_FILE_NAME);
-			// }
+			int status;
+			wait(&status);
+			if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
+			{
+				if (WIFEXITED(status))
+					exit_status = WEXITSTATUS(status);
+				else
+					exit_status = 1;
+				free(buf);
+				unlink(TEMP_FILE_NAME);
+			}
+			else
+			{
+				int fd = open("temp", O_RDONLY);
+				if (fd < 0)
+				{
+					panic("open");
+					exit(1);
+				}
+				read(fd, &exit_status, sizeof(int));
+				free(buf);
+				unlink("temp");
+				unlink(TEMP_FILE_NAME);
+			}
 		}
     }
     exit(0);
