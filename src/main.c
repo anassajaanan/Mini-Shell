@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/19 13:41:17 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/19 15:06:49 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -590,7 +590,7 @@ void	handle_herdoc(int signum)
 
 void	norm_sig(int sig)
 {
-	printf("norm_sig\n");
+	// printf("norm_sig\n");
 	if (sig == SIGQUIT)
 		ft_printf_fd(STDERR_FILENO, "Quit: %d\n", SIGQUIT);
 	else if (sig == SIGINT)
@@ -659,12 +659,16 @@ int main(int argc, char **argv, char **envp)
 			cd(((t_execcmd *)main_tree)->args, &exit_status);
 		else
 		{
-			
-			// signal(SIGINT, norm_sig);
-			// signal(SIGQUIT, norm_sig);
-			signal(SIGINT, handle_herdoc);
-			signal(SIGQUIT, handle_herdoc);
-			
+			if (main_tree && main_tree->type == REDIR)
+			{
+				signal(SIGINT, handle_herdoc);
+				signal(SIGQUIT, handle_herdoc);
+			}
+			else
+			{
+				signal(SIGINT, norm_sig);
+				signal(SIGQUIT, norm_sig);
+			}
 			if(forking() == 0)
 			{
 				// display_tree(main_tree);
