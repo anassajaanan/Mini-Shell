@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/18 17:21:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/19 13:41:17 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,12 +373,8 @@ void	display_tree(t_cmd *cmd)
 	}
 }
 
-void	herdoc_handler(int signum)
-{
-	if (signum == SIGINT) {
-		
-	}
-}
+
+
 
 char *read_input_until_delimiter(const char *delimiter)
 {
@@ -401,18 +397,26 @@ char *read_input_until_delimiter(const char *delimiter)
 
 	int terminal_fd1 = open("/dev/tty", O_WRONLY);
 
+	
+
 	while (1)
 	{
 		ft_putstr_fd("> ", terminal_fd1);
+		line = NULL;
+				
 		line = get_next_line(0);
+		if (!line)
+			break;
 		if (ft_strlen(line) == ft_strlen(delimiter) + 1 &&
 			ft_strncmp(line, delimiter, ft_strlen(line) - 1) == 0)
 			break;
 		ft_strlcpy(input_buffer + buffer_len, line, ft_strlen(line) + 1);
 		buffer_len += ft_strlen(line);
 		free(line);
+		
 	}
-	free(line);
+	if (line)
+		free(line);
 	close(terminal_fd1);
 	return (input_buffer);
 }
@@ -435,6 +439,9 @@ void	write_input_to_temp_file(char *input)
 	close(fd);
 }
 
+
+void	handle_herdoc(int signum);
+void	norm_sig(int sig);
 
 
 
@@ -495,6 +502,8 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	}
 	else if(cmd->type == REDIR)
 	{
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
 		rcmd = (t_redircmd *)cmd;
 		if (rcmd->redirection_type != '%')
 		{
@@ -507,7 +516,6 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		}
 		else
 		{
-			
 			char *input;
 			input = read_input_until_delimiter(rcmd->file);
 			write_input_to_temp_file(input);
@@ -519,12 +527,10 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 				exit(1);
 			}
 		}
-		
 		run_cmd(rcmd->subcmd, env_var_list, exit_status);
 	}
 	else if (cmd->type == EXEC)
 	{
-		
 		ecmd = (t_execcmd *)cmd;
 		if (ecmd->args[0] == NULL)
 			exit(0);
@@ -551,10 +557,40 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	exit(0);
 }
 
+int	g_parent_pid;
 
+void	handle_herdoc(int signum)
+{
+	// ft_printf("handle_herdoc\n");
+	if (signum == SIGINT)
+	{
+		ft_printf("\n");
+		int pid;
+		int fd = open("temppp", O_RDONLY);
+		if (fd < 0)
+		{
+			panic("open");
+			exit(1);
+		}
+		if (read(fd, &pid, sizeof(int)) < 0)
+		{
+			panic("read");
+			exit(1);
+		}
+		close(fd);
+
+		// kill the child process
+		kill(pid, SIGKILL);
+	}
+	else if (signum == SIGQUIT)
+	{
+		ft_printf("\b\b  \b\b");
+	}
+}
 
 void	norm_sig(int sig)
 {
+	printf("norm_sig\n");
 	if (sig == SIGQUIT)
 		ft_printf_fd(STDERR_FILENO, "Quit: %d\n", SIGQUIT);
 	else if (sig == SIGINT)
@@ -564,9 +600,20 @@ void	norm_sig(int sig)
 
 static void	sig(int signum)
 {
+	// ft_printf("sig\n");
 	if (signum == SIGINT)
 	{
-		printf("\nminishell$ ");
+		ft_printf_fd(STDERR_FILENO, "\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+	}
+	else if (signum == SIGQUIT)
+	{
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
+		ft_putstr_fd("\033[2K\rminishell$ ", 2);
 	}
 }
 
@@ -581,24 +628,20 @@ int main(int argc, char **argv, char **envp)
 	env_var_list = NULL;
 	copy_env_to_list(envp, &env_var_list);
 	
-	
+	g_parent_pid = getpid();
 	
     while (1)
     {
 		signal(SIGINT, sig);
-    	signal(SIGQUIT, SIG_IGN);
-		printf("minishell$ ");
-        buf = readline("");
+    	signal(SIGQUIT, sig);
+        buf = readline("minishell$ ");
 		if (buf == NULL)
 		{
 			ft_printf("exit\n");
 			break;
 		}
         if (ft_strlen(buf) == 0 || !buf)
-		{
-			printf("\n");
             continue;
-		}
 
 		main_tree = parse_cmd(buf);
 
@@ -616,12 +659,29 @@ int main(int argc, char **argv, char **envp)
 			cd(((t_execcmd *)main_tree)->args, &exit_status);
 		else
 		{
-			signal(SIGINT, norm_sig);
-			signal(SIGQUIT, norm_sig);
+			
+			// signal(SIGINT, norm_sig);
+			// signal(SIGQUIT, norm_sig);
+			signal(SIGINT, handle_herdoc);
+			signal(SIGQUIT, handle_herdoc);
 			
 			if(forking() == 0)
 			{
 				// display_tree(main_tree);
+				int pid = getpid();
+				int fd = open("temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+				if (fd < 0)
+				{
+					panic("open");
+					exit(1);
+				}
+				if (write(fd, &pid, sizeof(int)) < 0)
+				{
+					panic("write");
+					exit(1);
+				}
+				close(fd);
+
 				
 				run_cmd(main_tree, &env_var_list, exit_status);
 			}
