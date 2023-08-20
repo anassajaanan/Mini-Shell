@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/20 14:17:59 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:59:38 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ char	*get_var_name(char *arg)
 	return (ft_substr(arg, 0, i));
 }
 
-void	echo(char **argv, int *exit_status)
+void	echo(char **argv, int exit_status)
 {
 	int	i;
 	int	new_line;
@@ -108,8 +108,7 @@ void	echo(char **argv, int *exit_status)
 	if (!is_valid_echo_command(argv))
 	{
 		ft_printf_fd(STDERR_FILENO, "minishell: syntax error: unbalanced quotes\n");
-		*exit_status = 258;
-		return ;
+		exit(258);
 	}
 	i = 1;
 	new_line = 1;
@@ -153,7 +152,7 @@ void	echo(char **argv, int *exit_status)
 				{
 					if (arg[j] == '$' && arg[j + 1] == '?')
 					{
-						ft_printf("%d", *exit_status);
+						ft_printf("%d", exit_status);
 						j += 2;
 					}
 					else if (arg[j] == '$')
@@ -181,7 +180,7 @@ void	echo(char **argv, int *exit_status)
 				j++;
 				if (arg[j] == '?')
 				{
-					ft_printf("%d", *exit_status);
+					ft_printf("%d", exit_status);
 					j++;
 				}
 				else

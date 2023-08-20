@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/20 14:18:40 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/20 16:58:56 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -552,7 +552,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		if (strcmp(ecmd->args[0], "echo") == 0)
 		{
 			// echo(ecmd->args, exit_status);
-			echo(ecmd->args, &exit_status);
+			echo(ecmd->args, exit_status);
 		}
 		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
 			env(env_var_list);
@@ -723,6 +723,8 @@ int main(int argc, char **argv, char **envp)
 					exit_status = WEXITSTATUS(status);
 				else
 					exit_status = 1;
+				if (exit_status == 2)
+					exit_status = 258;
 				free(buf);
 				unlink(TEMP_FILE_NAME);
 			}
@@ -739,6 +741,8 @@ int main(int argc, char **argv, char **envp)
 				unlink("temp");
 				unlink(TEMP_FILE_NAME);
 			}
+
+			
 		}
     }
     exit(0);
