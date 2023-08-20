@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/19 15:06:49 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/20 14:18:40 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 #define REDIR 2
 #define PIPE  3
 
-#define MAXARGS 10
+#define MAXARGS 50
 
 
 typedef struct s_cmd
@@ -158,29 +158,44 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 			s++;
 		}
 	}
-	else if (token == '\'')
-	{
-		token = 'a';
-		s++;
-		while (s < es && *s != '\'')
-			s++;
-		if (s < es)
-			s++;
-	}
-	else if (token == '\"')
-	{
-		token = 'a';
-		s++;
-		while (s < es && *s != '\"')
-			s++;
-		if (s < es)
-			s++;
-	}
+	// else if (token == '\'')
+	// {
+	// 	token = 'a';
+	// 	s++;
+	// 	while (s < es && *s != '\'')
+	// 		s++;
+	// 	while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
+	// 		s++;
+	// }
+	// else if (token == '\"')
+	// {
+	// 	token = 'a';
+	// 	s++;
+	// 	while (s < es && *s != '\"')
+	// 		s++;
+	// 	while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
+	// 		s++;
+	// }
 	else
 	{
 		token = 'a';
 		while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
-			s++;
+		{
+			if (*s == '\"')
+			{
+				s++;
+				while (s < es && *s != '\"')
+					s++;
+			}
+			else if (*s == '\'')
+			{
+				s++;
+				while (s < es && *s != '\'')
+					s++;
+			}
+			if (s < es)
+				s++;
+		}
 	}
 	if (eq)
 		*eq = s;
@@ -535,7 +550,10 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		if (ecmd->args[0] == NULL)
 			exit(0);
 		if (strcmp(ecmd->args[0], "echo") == 0)
-			echo(ecmd->args, exit_status);
+		{
+			// echo(ecmd->args, exit_status);
+			echo(ecmd->args, &exit_status);
+		}
 		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
 			env(env_var_list);
 		else if (ft_strcmp(ecmd->args[0], "export") == 0)
@@ -550,14 +568,13 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 			execvp(ecmd->args[0], ecmd->args);
 			ft_putstr_fd("minishell: ", 2);
 			ft_putstr_fd(ecmd->args[0], 2);
-			ft_putstr_fd(": command not found\n", 2);
+			ft_putstr_fd(": command not found\n", 2);          
 			exit(127);
 		}
 	}
 	exit(0);
 }
 
-int	g_parent_pid;
 
 void	handle_herdoc(int signum)
 {
@@ -598,6 +615,8 @@ void	norm_sig(int sig)
 }
 
 
+
+
 static void	sig(int signum)
 {
 	// ft_printf("sig\n");
@@ -628,7 +647,6 @@ int main(int argc, char **argv, char **envp)
 	env_var_list = NULL;
 	copy_env_to_list(envp, &env_var_list);
 	
-	g_parent_pid = getpid();
 	
     while (1)
     {
@@ -672,6 +690,14 @@ int main(int argc, char **argv, char **envp)
 			if(forking() == 0)
 			{
 				// display_tree(main_tree);
+				// char **argv = ((t_execcmd *)main_tree)->args;
+				// int k = 0;
+				// while (argv[k])
+				// {
+				// 	printf("%s\n", argv[k]);
+				// 	k++;
+				// }
+				
 				int pid = getpid();
 				int fd = open("temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
 				if (fd < 0)
