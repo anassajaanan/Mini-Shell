@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/20 16:59:38 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 08:52:23 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,8 +163,8 @@ void	echo(char **argv, int exit_status)
 						char *value = getenv(var_name);
 						if (value)
 							ft_printf("%s", value);
-						free(var_name);
 						j += ft_strlen(var_name);
+						free(var_name);
 					}
 					else
 					{
@@ -189,8 +189,8 @@ void	echo(char **argv, int exit_status)
 					char *value = getenv(var_name);
 					if (value)
 						ft_printf("%s", value);
-					free(var_name);
 					j += ft_strlen(var_name);
+					free(var_name);
 				}
 			}
 			else
