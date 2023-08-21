@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 10:27:14 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 11:08:41 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ char	*extract_variable_name(char *arg, char *equal_sign)
 	return (key);
 }
 
-int	is_valid_variable_name(char *key)
+static int	is_valid_variable_name(char *key)
 {
 	int	i;
 

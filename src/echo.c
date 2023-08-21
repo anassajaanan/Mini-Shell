@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 08:52:23 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 14:53:08 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,12 +95,12 @@ char	*get_var_name(char *arg)
 		int n = arg[i] - '0';
 		return (ft_itoa(n));
 	}
-	while (arg[i] && !ft_strchr(" \t\n\v\f\r\'\"$/=", arg[i]))
+	while (arg[i] && ((ft_isalnum(arg[i]) || arg[i] == '_')))
 		i++;
 	return (ft_substr(arg, 0, i));
 }
 
-void	echo(char **argv, int exit_status)
+void	echo(char **argv, t_env_var *env_var_list, int exit_status)
 {
 	int	i;
 	int	new_line;
@@ -127,7 +127,7 @@ void	echo(char **argv, int exit_status)
 		char *arg = argv[i];
 		if (ft_strcmp(arg, "~") == 0)
 		{
-			ft_printf("%s", getenv("HOME"));
+			ft_printf("%s", getenv_value("HOME", env_var_list));
 			i++;
 			continue ;
 		}
@@ -160,7 +160,7 @@ void	echo(char **argv, int exit_status)
 						j++;
 						char *var_name = get_var_name(arg + j);
 						// ft_printf("{%s}", var_name);
-						char *value = getenv(var_name);
+						char *value = getenv_value(var_name, env_var_list);
 						if (value)
 							ft_printf("%s", value);
 						j += ft_strlen(var_name);
@@ -186,7 +186,7 @@ void	echo(char **argv, int exit_status)
 				else
 				{
 					char *var_name = get_var_name(arg + j);
-					char *value = getenv(var_name);
+					char *value = getenv_value(var_name, env_var_list);
 					if (value)
 						ft_printf("%s", value);
 					j += ft_strlen(var_name);

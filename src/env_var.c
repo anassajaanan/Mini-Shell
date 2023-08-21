@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 09:56:10 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 14:45:33 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,4 +130,19 @@ void	free_env_var_list(t_env_var *env_var_list)
 		current = current->next;
 		free_env_var_node(tmp);
 	}
+}
+
+
+char *getenv_value(char *key, t_env_var *env_var_list)
+{
+	t_env_var	*tmp;
+
+	tmp = env_var_list;
+	while (tmp)
+	{
+		if (strcmp(tmp->key, key) == 0)
+			return (tmp->value);
+		tmp = tmp->next;
+	}
+	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 17:47:13 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/17 08:11:25 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 13:24:54 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ int		ft_printf_fd(int fd, const char *format, ...);
 /* QUEUE_CHAR */
 void	init_queue_char(t_queue_char *q);
 void	enqueue_char(t_queue_char *q, char c);
+void	enqueue_str(t_queue_char *q, char *str);
 char	dequeue_char(t_queue_char *q);
 int		queue_char_is_empty(t_queue_char *q);
 

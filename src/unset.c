@@ -6,11 +6,28 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 17:27:02 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 08:39:55 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 12:17:20 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+static int	is_valid_variable_name(char *key)
+{
+	int	i;
+
+	i = 0;
+	if (!ft_isalpha(key[i]) && key[i] != '_')
+		return (0);
+	i++;
+	while (key[i])
+	{
+		if (!ft_isalnum(key[i]) && key[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 void	unset_env_var(char **args, t_env_var **env_var_list, int *exit_status)
 {
@@ -21,11 +38,10 @@ void	unset_env_var(char **args, t_env_var **env_var_list, int *exit_status)
 	i = 1;
 	while (args[i])
 	{
-		if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
+
+		if (!is_valid_variable_name(args[i]))
 		{
-			ft_putstr_fd("minishell: unset: `", 2);
-			ft_putstr_fd(args[i], 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
+			ft_printf_fd(2, "minishell: unset: `%s': not a valid identifier\n", args[i]);
 			*exit_status = 1;
 			i++;
 			continue ;

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/20 16:32:39 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 15:07:44 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void		copy_env_to_list(char **envp, t_env_var **env_var_list);
 void		free_env_var_node(t_env_var *node);
 void		free_env_var_list(t_env_var *env_var_list);
 
+char	*getenv_value(char *key, t_env_var *env_var_list);
 
 // =================== echo.c ======================//
 void	env(t_env_var **env_var_list);
@@ -74,9 +75,11 @@ void	print_environment_variables(t_env_var *env_var_list);
 void	export(char **args, t_env_var *env_var_list);
 void	handle_export_command(char **args, t_env_var **env_var_list, int *exit_status);
 
-void	cd(char **args, int *exit_status);
+// void	cd(char **args, int *exit_status);
+void	cd(char **argv, int *exit_status, t_env_var *env_var_list);
 
 void	unset_env_var(char **args, t_env_var **env_var_list, int *exit_status);
 
 
-void	echo(char **argv, int exit_status);
+// void	echo(char **argv, int exit_status);
+void	echo(char **argv, t_env_var *env_var_list, int exit_status);

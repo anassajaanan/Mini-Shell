@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:56:35 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 17:58:19 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 13:24:31 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,18 @@ char	dequeue_char(t_queue_char *q)
 	value = tmp->val;
 	free(tmp);
 	return (value);
+}
+
+void	enqueue_str(t_queue_char *q, char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		enqueue_char(q, str[i]);
+		i++;
+	}
 }
 
 int	queue_char_is_empty(t_queue_char *q)

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 09:42:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 14:54:31 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -569,7 +569,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		if (strcmp(ecmd->args[0], "echo") == 0)
 		{
 			// echo(ecmd->args, exit_status);
-			echo(ecmd->args, exit_status);
+			echo(ecmd->args, *env_var_list, exit_status);
 		}
 		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
 			env(env_var_list);
@@ -691,7 +691,7 @@ int main(int argc, char **argv, char **envp)
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
 			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
-			cd(((t_execcmd *)main_tree)->args, &exit_status);
+			cd(((t_execcmd *)main_tree)->args, &exit_status, env_var_list);
 		else
 		{
 			if (main_tree && main_tree->type == REDIR)

@@ -3,8 +3,6 @@ NAME		=	minishell
 CC			=	gcc
 CFLAGS		=	-Wall -Wextra -Werror -g
 
-
-
 ifeq ($(shell uname -p), i386)
 	LIB_FLAGS	=	-L./lib/libft -lft -L./lib/readline/lib -lreadline
 	INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include
