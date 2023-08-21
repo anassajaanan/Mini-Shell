@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 08:26:32 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 10:27:14 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,37 @@ void	export(char **args, t_env_var *env_var_list)
 	}
 }
 
+char	*extract_variable_name(char *arg, char *equal_sign)
+{
+	char	*key;
+
+	if (!equal_sign)
+		return (ft_strdup(arg));
+	key = ft_substr(arg, 0, equal_sign - arg);
+	return (key);
+}
+
+int	is_valid_variable_name(char *key)
+{
+	int	i;
+
+	i = 0;
+	if (!ft_isalpha(key[i]) && key[i] != '_')
+		return (0);
+	i++;
+	while (key[i])
+	{
+		if (!ft_isalnum(key[i]) && key[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 void	handle_export_command(char **args, t_env_var **env_var_list, int *exit_status)
 {
 	int			i;
-	char		**key_value;
+	char		*key;
 	char		*equal_sign;
 	t_env_var	*new_node;
 	
@@ -51,27 +78,25 @@ void	handle_export_command(char **args, t_env_var **env_var_list, int *exit_stat
 	i = 1;
 	while (args[i])
 	{
-		if (!ft_isalpha(args[i][0]) && args[i][0] != '_')
+		equal_sign = ft_strchr(args[i], '=');
+		key = extract_variable_name(args[i], equal_sign);
+		if (!is_valid_variable_name(key))
 		{
-			ft_putstr_fd("minishell: export: `", 2);
-			ft_putstr_fd(args[i], 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
+			ft_printf_fd(STDERR_FILENO, "minishell: export: `%s': not a valid identifier\n", args[i]);
 			*exit_status = 1;
 			i++;
+			free(key);
 			continue ;
 		}
-		equal_sign = ft_strchr(args[i], '=');
 		if (!equal_sign)
 		{
-			new_node = env_var_new(ft_strdup(args[i]), NULL);
+			new_node = env_var_new(key, NULL);
 			env_var_insert_sorted(env_var_list, new_node);
 		}
 		else
 		{
-			key_value = ft_split(args[i], '=');
-			new_node = env_var_new(ft_strdup(key_value[0]), ft_strdup(equal_sign + 1));
+			new_node = env_var_new(key, ft_strdup(equal_sign + 1));
 			env_var_insert_sorted(env_var_list, new_node);
-			free_args(key_value);
 		}
 		i++;
 	}

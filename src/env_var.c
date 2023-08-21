@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/14 17:27:12 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 09:56:10 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ int	env_var_update_value(t_env_var **env_var_list, t_env_var *new_node)
 	{
 		if (strcmp(tmp->key, new_node->key) == 0)
 		{
+			if (new_node->value == NULL)
+				return (1);
 			free(tmp->value);
 			tmp->value = ft_strdup(new_node->value);
 			free_env_var_node(new_node);

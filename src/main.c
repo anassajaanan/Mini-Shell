@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/20 16:58:56 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/21 09:42:36 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,29 +158,13 @@ int	get_next_token(char **ps, char *es, char **q, char **eq)
 			s++;
 		}
 	}
-	// else if (token == '\'')
-	// {
-	// 	token = 'a';
-	// 	s++;
-	// 	while (s < es && *s != '\'')
-	// 		s++;
-	// 	while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
-	// 		s++;
-	// }
-	// else if (token == '\"')
-	// {
-	// 	token = 'a';
-	// 	s++;
-	// 	while (s < es && *s != '\"')
-	// 		s++;
-	// 	while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
-	// 		s++;
-	// }
+
 	else
 	{
 		token = 'a';
 		while (s < es && !ft_strchr(whitespaces, *s) && !ft_strchr(symbols, *s))
 		{
+			// =========# This for echo command  #==========//
 			if (*s == '\"')
 			{
 				s++;
@@ -388,7 +372,40 @@ void	display_tree(t_cmd *cmd)
 	}
 }
 
+void	edit_tree_quotes_grep(t_cmd *cmd)
+{
+	t_execcmd	*ecmd;
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
 
+	if (cmd->type == PIPE)
+	{
+		pcmd = (t_pipecmd *)cmd;
+		edit_tree_quotes_grep(pcmd->left);
+		edit_tree_quotes_grep(pcmd->right);
+	}
+	else if (cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		edit_tree_quotes_grep(rcmd->subcmd);
+	}
+	else if (cmd->type == EXEC)
+	{
+		ecmd = (t_execcmd *)cmd;
+		if (ft_strcmp(ecmd->args[0], "grep") == 0)
+		{
+			for (int i = 1; ecmd->args[i]; i++)
+			{
+				if (ecmd->args[i][0] == '\"')
+				{
+					ecmd->args[i] = ecmd->args[i] + 1;
+					ecmd->eargs[i] = ecmd->eargs[i] - 1;
+					ecmd->eargs[i][0] = '\0';
+				}
+			}
+		}
+	}
+}
 
 
 char *read_input_until_delimiter(const char *delimiter)
@@ -689,14 +706,9 @@ int main(int argc, char **argv, char **envp)
 			}
 			if(forking() == 0)
 			{
+				edit_tree_quotes_grep(main_tree);
 				// display_tree(main_tree);
-				// char **argv = ((t_execcmd *)main_tree)->args;
-				// int k = 0;
-				// while (argv[k])
-				// {
-				// 	printf("%s\n", argv[k]);
-				// 	k++;
-				// }
+				
 				
 				int pid = getpid();
 				int fd = open("temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
