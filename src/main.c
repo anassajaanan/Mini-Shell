@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/22 16:21:21 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 19:37:17 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -529,7 +529,7 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		} else {
 			exit_status = 1;
 		}
-		int fd = open("temp", O_WRONLY | O_CREAT | O_APPEND, 0777);
+		int fd = open("exit_status.tmp", O_WRONLY | O_CREAT | O_APPEND, 0777);
 		if (fd < 0)
 		{
 			panic("open");
@@ -617,7 +617,7 @@ void	handle_herdoc(int signum)
 	{
 		ft_printf("\n");
 		int pid;
-		int fd = open("./temppp", O_RDONLY);
+		int fd = open("./child_pid.tmp", O_RDONLY);
 		if (fd < 0)
 		{
 			panic("open");
@@ -725,6 +725,27 @@ int	validate_command(char *buf, int *exit_status)
 	return (1);
 }
 
+int execute_builtin(t_cmd *main_tree, int *exit_status, t_env_var **env_var_list)
+{
+	int	flag;
+
+	flag = 1;
+	if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+	{
+		exit_command(((t_execcmd *)main_tree)->args, exit_status);
+	}
+	else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
+		handle_export_command(((t_execcmd *)main_tree)->args, env_var_list, exit_status);
+	else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
+		unset_env_var(((t_execcmd *)main_tree)->args, env_var_list, exit_status);
+	else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
+		cd(((t_execcmd *)main_tree)->args, exit_status, *env_var_list);
+	else
+		flag = 0;
+	return (flag);
+	
+}
+
 int main(int argc, char **argv, char **envp)
 {
     char    	*buf;
@@ -759,83 +780,70 @@ int main(int argc, char **argv, char **envp)
 		}
 		main_tree = parse_cmd(buf);
 
-		// if (forking() == 0)
-		// {
-		// 	run_cmd(main_tree, &env_var_list, exit_status);
-		// }
-		// wait(NULL);
+		
 
-		if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+		if (execute_builtin(main_tree, &exit_status, &env_var_list) == 1)
 		{
-			exit_command(((t_execcmd *)main_tree)->args, &exit_status);
+			free(buf);
+			// free tree
+			continue;
 		}
-		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
-			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
-		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
-			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
-		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
-			cd(((t_execcmd *)main_tree)->args, &exit_status, env_var_list);
+		if (main_tree && main_tree->type == REDIR)
+		{
+			signal(SIGINT, handle_herdoc);
+			signal(SIGQUIT, handle_herdoc);
+		}
 		else
 		{
-			if (main_tree && main_tree->type == REDIR)
+			signal(SIGINT, norm_sig);
+			signal(SIGQUIT, norm_sig);
+		}
+		if(forking() == 0)
+		{
+			edit_tree_quotes_grep(main_tree);
+			// display_tree(main_tree);
+			
+			
+			int pid = getpid();
+			int fd = open("./child_pid.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+			if (fd < 0)
 			{
-				signal(SIGINT, handle_herdoc);
-				signal(SIGQUIT, handle_herdoc);
+				panic("open");
+				exit(1);
 			}
-			else
+			if (write(fd, &pid, sizeof(int)) < 0)
 			{
-				signal(SIGINT, norm_sig);
-				signal(SIGQUIT, norm_sig);
+				panic("write");
+				exit(1);
 			}
-			if(forking() == 0)
-			{
-				edit_tree_quotes_grep(main_tree);
-				// display_tree(main_tree);
-				
-				
-				int pid = getpid();
-				int fd = open("./temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
-				if (fd < 0)
-				{
-					panic("open");
-					exit(1);
-				}
-				if (write(fd, &pid, sizeof(int)) < 0)
-				{
-					panic("write");
-					exit(1);
-				}
-				close(fd);
+			close(fd);
 
-				
-				run_cmd(main_tree, &env_var_list, exit_status);
-			}
-			int status;
-			wait(&status);
-			if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
-			{
-				if (WIFEXITED(status))
-					exit_status = WEXITSTATUS(status);
-				else
-					exit_status = 1;
-				if (exit_status == 2)
-					exit_status = 258;
-				free(buf);
-				unlink(TEMP_FILE_NAME);
-			}
+			
+			run_cmd(main_tree, &env_var_list, exit_status);
+		}
+		int status;
+		wait(&status);
+		if (main_tree && (main_tree->type == EXEC || main_tree->type == REDIR))
+		{
+			if (WIFEXITED(status))
+				exit_status = WEXITSTATUS(status);
 			else
+				exit_status = 1;
+			free(buf);
+			unlink(TEMP_FILE_NAME);
+		}
+		else
+		{
+			int fd = open("exit_status.tmp", O_RDONLY);
+			if (fd < 0)
 			{
-				int fd = open("temp", O_RDONLY);
-				if (fd < 0)
-				{
-					panic("open");
-					exit(1);
-				}
-				read(fd, &exit_status, sizeof(int));
-				free(buf);
-				unlink("temp");
-				unlink(TEMP_FILE_NAME);
+				panic("open");
+				exit(1);
 			}
+			read(fd, &exit_status, sizeof(int));
+			free(buf);
+			unlink("temp");
+			unlink(TEMP_FILE_NAME);
 		}
     }
     exit(0);
