@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 14:54:31 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 08:02:30 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,22 +206,6 @@ t_cmd *parse_pipe(char **ps, char *es);
 t_cmd	*null_terminator(t_cmd *cmd);
 t_cmd	*parse_exec(char **ps, char *es);
 
-t_cmd *parse_cmd(char *buf)
-{
-	char	*ps;
-	char	*es;
-	t_cmd	*cmd;
-
-	ps  = buf;
-	es = ps + ft_strlen(ps);
-	cmd = parse_pipe(&ps, es);
-	peek(&ps, es, "");
-	if (ps != es)
-		panic("Syntax Error");
-	null_terminator(cmd);
-	return (cmd);
-}
-
 t_cmd	*null_terminator(t_cmd *cmd)
 {
 	t_execcmd	*ecmd;
@@ -252,6 +236,22 @@ t_cmd	*null_terminator(t_cmd *cmd)
 		null_terminator(pcmd->right);
 	}
 	return(cmd);
+}
+
+t_cmd *parse_cmd(char *buf)
+{
+	char	*ps;
+	char	*es;
+	t_cmd	*cmd;
+
+	ps  = buf;
+	es = ps + ft_strlen(ps);
+	cmd = parse_pipe(&ps, es);
+	peek(&ps, es, "");
+	if (ps != es)
+		panic("Syntax Error");
+	null_terminator(cmd);
+	return (cmd);
 }
 
 t_cmd *parse_pipe(char **ps, char *es)
@@ -320,7 +320,10 @@ t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 	{
 		tok = get_next_token(ps, es, 0, 0);
 		if (get_next_token(ps, es, &q, &eq) != 'a')
-			panic("Syntax Error: Missing file for redirection");
+		{
+			ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `newline'\n");
+			exit(258);
+		}
 		if (tok == '<')
 			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0, '<');
 		else if (tok == '>')
@@ -577,7 +580,13 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 			export(ecmd->args, *env_var_list);
 		else if (ft_strcmp(ecmd->args[0], "unset") == 0)
 		{
-			return;
+			exit(0);
+		}
+		else if (ft_strcmp(ecmd->args[0], "pwd") == 0)
+		{
+			char *pwd = getcwd(NULL, 0);
+			ft_printf("%s\n", pwd);
+			free(pwd);
 		}
 		else
 		{
@@ -677,9 +686,34 @@ int main(int argc, char **argv, char **envp)
 		}
         if (ft_strlen(buf) == 0 || !buf)
             continue;
+		
+
 
 		main_tree = parse_cmd(buf);
-
+		// =========== create a childe process to parse the command
+		// if (forking() == 0)
+		// {
+		// 	main_tree = parse_cmd(buf);
+			
+		// }
+		// int status1 = 0;
+		// // waitpid(-1, &status1, 0);
+		// wait(&status1);
+		// if (WIFEXITED(status1))
+		// {
+		// 	exit_status = WEXITSTATUS(status1);
+		// 	if (exit_status == 2)
+		// 		exit_status = 258;
+		// }
+		// else
+		// 	exit_status = 1;	
+		// if (status1 != 0)
+		// {
+		// 	ft_printf("the exit status is %d\n", exit_status);
+		// 	free(buf);
+		// 	continue;
+		// }
+		// =======Finish
 
 		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
@@ -753,8 +787,6 @@ int main(int argc, char **argv, char **envp)
 				unlink("temp");
 				unlink(TEMP_FILE_NAME);
 			}
-
-			
 		}
     }
     exit(0);
