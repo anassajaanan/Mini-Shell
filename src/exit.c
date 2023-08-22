@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/22 08:53:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 15:07:02 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,5 +132,10 @@ void	exit_command(char **argv, int *exit_status)
 			free(arg);
 			exit(exit_code);
 		}
+	}
+	else
+	{
+		ft_printf("exit\n");
+		exit(0);
 	}
 }

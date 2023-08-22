@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/22 08:24:22 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 16:21:21 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -285,9 +285,11 @@ t_cmd	*parse_exec(char **ps, char *es)
 	{
 		tok = get_next_token(ps, es, &q, &eq);
 		if (tok == '\0')
+		{
 			break;
-		if (tok != 'a')
-			panic("Syntax Error");
+		}
+		// if (tok != 'a')
+		// 	panic("Syntax Error");
 		ecmd->args[argc] = q;
 		ecmd->eargs[argc] = eq;
 		argc++;
@@ -319,11 +321,12 @@ t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 	if (peek(ps, es, "<>"))
 	{
 		tok = get_next_token(ps, es, 0, 0);
-		if (get_next_token(ps, es, &q, &eq) != 'a')
-		{
-			ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `newline'\n");
-			exit(258);
-		}
+		// if (get_next_token(ps, es, &q, &eq) != 'a')
+		// {
+		// 	ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `newline'\n");
+		// 	exit(258);
+		// }
+		get_next_token(ps, es, &q, &eq);
 		if (tok == '<')
 			cmd = redircmd(parse_redir(subcmd, ps, es), q, eq, O_RDONLY, 0, '<');
 		else if (tok == '>')
@@ -367,10 +370,12 @@ void	display_tree(t_cmd *cmd)
 		ecmd = (t_execcmd *)cmd;
 		printf("=========EXEC=======\n");
 		printf("The command is : ");
-		for (int i = 0; ecmd->args[i]; i++)
+		int i;
+		for (i = 0; ecmd->args[i]; i++)
 		{
 			printf("%s ", ecmd->args[i]);
 		}
+		// printf("number of args is : %d\n", i);
 		printf("\n\n");
 	}
 }
@@ -395,7 +400,8 @@ void	edit_tree_quotes_grep(t_cmd *cmd)
 	else if (cmd->type == EXEC)
 	{
 		ecmd = (t_execcmd *)cmd;
-		if (ft_strcmp(ecmd->args[0], "grep") == 0)
+		
+		if (ecmd->args[0] && ft_strcmp(ecmd->args[0], "grep") == 0)
 		{
 			for (int i = 1; ecmd->args[i]; i++)
 			{
@@ -517,7 +523,8 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 		waitpid(pid2, &status, 0);
 		int	exit_status;
 		
-		if (WIFEXITED(status)) {
+		if (WIFEXITED(status))
+		{
 			exit_status = WEXITSTATUS(status);
 		} else {
 			exit_status = 1;
@@ -568,10 +575,11 @@ void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	{
 		ecmd = (t_execcmd *)cmd;
 		if (ecmd->args[0] == NULL)
-			exit(0);
-		if (strcmp(ecmd->args[0], "echo") == 0)
 		{
-			// echo(ecmd->args, exit_status);
+			exit(0);
+		}
+		else if (strcmp(ecmd->args[0], "echo") == 0)
+		{
 			echo(ecmd->args, *env_var_list, exit_status);
 		}
 		else if (ft_strcmp(ecmd->args[0], "env") == 0 && ecmd->args[1] == NULL)
@@ -609,7 +617,7 @@ void	handle_herdoc(int signum)
 	{
 		ft_printf("\n");
 		int pid;
-		int fd = open("temppp", O_RDONLY);
+		int fd = open("./temppp", O_RDONLY);
 		if (fd < 0)
 		{
 			panic("open");
@@ -662,6 +670,61 @@ static void	sig(int signum)
 	}
 }
 
+int	validate_command(char *buf, int *exit_status)
+{
+	char	*ps;
+	char	*es;
+	int		tok;
+	char	*q;
+	char	*eq;
+	// int		argc;
+
+	ps = buf;
+	es = ps + ft_strlen(ps);
+	
+	if (peek(&ps, es, "|"))
+	{
+		ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `|'\n");
+		*exit_status = 258;
+		return (0);
+	}
+	while (!peek(&ps, es, "\0"))
+	{
+		tok = get_next_token(&ps, es, 0, 0);
+		if (tok == '>' || tok == '<' || tok == '+' || tok == '%')
+		{
+			tok = get_next_token(&ps, es, &q, &eq);
+			if (tok == '\0')
+			{
+				ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `newline'\n");
+				*exit_status = 258;
+				return (0);
+			}
+			else if (tok != 'a')
+			{
+				*eq = '\0';
+				ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `%s'\n", q);
+				*exit_status = 258;
+				return (0);
+			}
+		}
+		else if (tok == '|')
+		{
+			if (get_next_token(&ps, es, 0, 0) == '|')
+			{
+				ft_printf_fd(STDERR_FILENO, "minishell: syntax error near unexpected token `|'\n");
+				*exit_status = 258;
+				return (0);
+			}
+		}
+		else if (tok == '\0')
+		{
+			break;
+		}
+	}
+	return (1);
+}
+
 int main(int argc, char **argv, char **envp)
 {
     char    	*buf;
@@ -678,7 +741,9 @@ int main(int argc, char **argv, char **envp)
     {
 		signal(SIGINT, sig);
     	signal(SIGQUIT, sig);
-        buf = readline("minishell$ ");
+        buf = readline(BCYN "minishell$ " reset);
+		add_history(buf);
+		
 		if (buf == NULL)
 		{
 			ft_printf("exit\n");
@@ -687,43 +752,28 @@ int main(int argc, char **argv, char **envp)
         if (ft_strlen(buf) == 0 || !buf)
             continue;
 		
-
-
+		if (validate_command(buf, &exit_status) == 0)
+		{
+			free(buf);
+			continue;
+		}
 		main_tree = parse_cmd(buf);
-		// =========== create a childe process to parse the command
+
 		// if (forking() == 0)
 		// {
-		// 	main_tree = parse_cmd(buf);
-			
+		// 	run_cmd(main_tree, &env_var_list, exit_status);
 		// }
-		// int status1 = 0;
-		// // waitpid(-1, &status1, 0);
-		// wait(&status1);
-		// if (WIFEXITED(status1))
-		// {
-		// 	exit_status = WEXITSTATUS(status1);
-		// 	if (exit_status == 2)
-		// 		exit_status = 258;
-		// }
-		// else
-		// 	exit_status = 1;	
-		// if (status1 != 0)
-		// {
-		// 	ft_printf("the exit status is %d\n", exit_status);
-		// 	free(buf);
-		// 	continue;
-		// }
-		// =======Finish
+		// wait(NULL);
 
-		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
+		if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
 			exit_command(((t_execcmd *)main_tree)->args, &exit_status);
 		}
-		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
+		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
 			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
-		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
+		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "unset") == 0)
 			unset_env_var(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);
-		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
+		else if (main_tree && main_tree->type == EXEC && ((t_execcmd *)main_tree)->args[0] && ft_strcmp(((t_execcmd *)main_tree)->args[0], "cd") == 0)
 			cd(((t_execcmd *)main_tree)->args, &exit_status, env_var_list);
 		else
 		{
@@ -744,7 +794,7 @@ int main(int argc, char **argv, char **envp)
 				
 				
 				int pid = getpid();
-				int fd = open("temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
+				int fd = open("./temppp", O_WRONLY | O_CREAT | O_TRUNC, 0777);
 				if (fd < 0)
 				{
 					panic("open");
