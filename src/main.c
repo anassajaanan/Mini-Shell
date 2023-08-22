@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/22 08:02:30 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 08:24:22 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -717,8 +717,7 @@ int main(int argc, char **argv, char **envp)
 
 		if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "exit") == 0)
 		{
-			ft_printf("exit\n");
-			break;
+			exit_command(((t_execcmd *)main_tree)->args, &exit_status);
 		}
 		else if (main_tree && main_tree->type == EXEC && ft_strcmp(((t_execcmd *)main_tree)->args[0], "export") == 0)
 			handle_export_command(((t_execcmd *)main_tree)->args, &env_var_list, &exit_status);

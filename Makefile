@@ -20,6 +20,7 @@ SRCS		=	src/main.c \
 				src/env_var.c \
 				src/queue.c \
 				src/utils.c \
+				src/exit.c \
 
 OBJS		=	$(SRCS:.c=.o)
 

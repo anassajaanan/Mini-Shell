@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 15:07:44 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/22 08:22:50 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,3 +83,6 @@ void	unset_env_var(char **args, t_env_var **env_var_list, int *exit_status);
 
 // void	echo(char **argv, int exit_status);
 void	echo(char **argv, t_env_var *env_var_list, int exit_status);
+
+
+void	exit_command(char **argv, int *exit_status);
