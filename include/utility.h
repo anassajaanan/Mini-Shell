@@ -1,14 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   utility.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 18:31:28 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/23 10:46:28 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/23 10:53:31 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#ifndef UTILITY_H
+# define UTILITY_H
 
+void	panic(char *s);
+void	panic_exit(int status, char *s);
+int		forking(void);
+int		is_whitespace(char c);
+
+#endif // UTILITY_H
