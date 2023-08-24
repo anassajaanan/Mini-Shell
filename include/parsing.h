@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 17:34:12 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 18:13:23 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/24 10:25:48 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,22 @@ int	validate_redirection(char **ps, char *es, int *exit_status);
 int	validate_pipe(char **ps, char *es, int *exit_status);
 
 
+// ┌───────────────────────────────────┐
+// │            parsing.c              │
+// └───────────────────────────────────┘
+t_cmd	*parse_cmd(char *buf, int *exit_status);
+t_cmd	*parse_pipe(char **ps, char *es, int *error);
+t_cmd	*parse_exec(char **ps, char *es, int *error);
 t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es);
+
+// ┌───────────────────────────────────┐
+// │       free_parsing.c              │
+// └───────────────────────────────────┘
+void	free_tree(t_cmd *cmd);
+	
+// ┌───────────────────────────────────┐
+// │       null_terminate.c            │
+// └───────────────────────────────────┘
+t_cmd	*null_terminate_command(t_cmd *cmd);
 
 #endif /* PARSING_H */

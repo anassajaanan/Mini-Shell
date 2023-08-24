@@ -1,22 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utility.h                                          :+:      :+:    :+:   */
+/*   env_var_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/23 10:46:28 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 13:13:29 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/24 12:23:23 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/24 12:23:52 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILITY_H
-# define UTILITY_H
+#include "../../include/minishell.h"
+#include "../../include/env.h"
 
-int		is_whitespace(char c);
-void	panic(char *s);
-void	panic_exit(int status, char *s);
-int		forking(void);
-void	pipe1(int fd[2]);
+void	free_env_var_node(t_env_var *node)
+{
+	if (node->key)
+		free(node->key);
+	if (node->value)
+		free(node->value);
+	free(node);
+}
 
-#endif // UTILITY_H
+void	free_env_var_list(t_env_var *env_var_list)
+{
+	t_env_var	*tmp;
+	t_env_var	*current;
+
+	current = env_var_list;
+	while (current)
+	{
+		tmp = current->next;
+		free_env_var_node(current);
+		current = tmp;
+	}
+}

@@ -6,12 +6,52 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:00:08 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 19:48:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/24 10:17:48 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/parsing.h"
+
+t_cmd	*parse_cmd(char *buf, int *exit_status)
+{
+	char	*ps;
+	char	*es;
+	t_cmd	*cmd;
+	int		error;
+
+	ps = buf;
+	es = ps + ft_strlen(buf);
+	error = 0;
+	cmd = parse_pipe(&ps, es, &error);
+	peek(&ps, es, "");
+	if (ps != es || error == 1)
+	{
+		if (error == 1)
+			ft_printf_fd(STDERR_FILENO, "minishell: too many arguments\n");
+		else
+			ft_printf_fd(STDERR_FILENO, "minishell: syntax error\n");
+		*exit_status = 258;
+		free_tree(cmd);
+		free(buf);
+		return (NULL);
+	}
+	null_terminate_command(cmd);
+	return (cmd);
+}
+
+t_cmd	*parse_pipe(char **ps, char *es, int *error)
+{
+	t_cmd	*cmd;
+
+	cmd = parse_exec(ps, es, error);
+	if (peek(ps, es, "|"))
+	{
+		get_next_token(ps, es, 0, 0);
+		cmd = pipecmd(cmd, parse_pipe(ps, es, error));
+	}
+	return (cmd);
+}
 
 t_cmd	*parse_redir(t_cmd *subcmd, char **ps, char *es)
 {

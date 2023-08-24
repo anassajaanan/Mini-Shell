@@ -6,12 +6,20 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 10:45:27 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 10:59:05 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/24 13:13:03 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/utility.h"
+
+int	is_whitespace(char c)
+{
+	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+		|| c == '\r')
+		return (1);
+	return (0);
+}
 
 void	panic(char *s)
 {
@@ -35,10 +43,9 @@ int	forking(void)
 	return (pid);
 }
 
-int	is_whitespace(char c)
+void	pipe1(int fd[2])
 {
-	if (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
-		|| c == '\r')
-		return (1);
-	return (0);
+	if (pipe(fd) == -1)
+		panic("pipe");
 }
+

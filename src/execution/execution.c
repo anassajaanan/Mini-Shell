@@ -1,22 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utility.h                                          :+:      :+:    :+:   */
+/*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/23 10:46:28 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 13:13:29 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/24 10:44:47 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/24 13:37:08 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILITY_H
-# define UTILITY_H
+#include "../../include/minishell.h"
+#include "../../include/execution.h"
 
-int		is_whitespace(char c);
-void	panic(char *s);
-void	panic_exit(int status, char *s);
-int		forking(void);
-void	pipe1(int fd[2]);
 
-#endif // UTILITY_H
+
+void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
+{
+	if (cmd->type == PIPE)
+	
+}

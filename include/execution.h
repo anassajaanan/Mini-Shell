@@ -1,22 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utility.h                                          :+:      :+:    :+:   */
+/*   execution.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/23 10:46:28 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 13:13:29 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/24 10:46:52 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/24 17:29:02 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTILITY_H
-# define UTILITY_H
+#ifndef EXECUTION_H
+# define EXECUTION_H
 
-int		is_whitespace(char c);
-void	panic(char *s);
-void	panic_exit(int status, char *s);
-int		forking(void);
-void	pipe1(int fd[2]);
+void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int *exit_status);
+void	run_pipe(t_cmd *cmd, t_env_var **env_var_list, int *exit_status);
+void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int exit_status);
 
-#endif // UTILITY_H
+#endif /* EXECUTION_H */

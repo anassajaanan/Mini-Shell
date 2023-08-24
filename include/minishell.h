@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 17:40:45 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/24 10:57:34 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,8 @@
 # include "../include/command.h"
 # include "../include/utility.h"
 # include "../include/parsing.h"
+# include "../include/execution.h"
+# include "../include/env.h"
+
 
 #endif //MINISHELL_H
