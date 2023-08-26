@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:46:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 17:28:47 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 15:14:56 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,32 @@ static void	write_herdoc_input(char *herdoc_input)
 	close(fd);
 }
 
+static void	open_redirection_file(t_redircmd *rcmd)
+{
+	char	*file;
+	
+	if (ft_strchr(rcmd->file, '\"'))
+	{
+		file = process_quoted_filename(rcmd->file);
+		if (open(file, rcmd->mode, 0644) < 0)
+		{
+			free(file);
+			panic("open");
+		}
+		free(file);
+	}
+	else
+	{
+		if (open(rcmd->file, rcmd->mode, 0644) < 0)
+			panic("open");
+	}
+}
+
 void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 {
-	t_redircmd	*rcmd;
-	char		*herdoc_input;
+	t_redircmd		*rcmd;
+	t_queue_char	q;
+	char			*herdoc_input;
 	
 	rcmd = (t_redircmd *)cmd;
 	signal(SIGINT, SIG_IGN);
@@ -65,8 +87,7 @@ void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int exit_status)
 	if (rcmd->r_type != '%')
 	{
 		close(rcmd->fd);
-		if (open(rcmd->file, rcmd->mode, 0644) < 0)
-			panic("open");
+		open_redirection_file(rcmd); 
 	}
 	else
 	{

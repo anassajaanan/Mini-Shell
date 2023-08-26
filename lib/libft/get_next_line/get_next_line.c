@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:16:04 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/16 17:58:19 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 14:33:18 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ char	*handle_bytes(ssize_t bytes, t_queue_char *q, char *buffer, int *fd)
 	else if (bytes == 0)
 	{
 		free(buffer);
-		if (queue_char_is_empty(q))
+		if (q->front == NULL)
 			return (NULL);
 		else
 			return (get_last_line(q));
@@ -114,7 +114,7 @@ char	*get_next_line(int fd)
 		init_queue_char(&q);
 		flag = 1;
 	}
-	if (!queue_char_is_empty(&q) && contains_newline(&q))
+	if (q.front && contains_newline(&q))
 		return (get_line(&q));
 	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE);
 	if (!buffer)

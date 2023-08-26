@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:56:35 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/21 13:24:31 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 14:35:24 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,25 @@ void	enqueue_str(t_queue_char *q, char *str)
 	}
 }
 
-int	queue_char_is_empty(t_queue_char *q)
+char	*queue_char_to_str(t_queue_char *q)
 {
-	if (q->front == NULL)
-		return (1);
-	return (0);
+	struct s_queue_node_char	*tmp;
+	char						*str;
+	int							i;
+
+	i = 0;
+	tmp = q->front;
+	while (tmp)
+	{
+		i++;
+		tmp = tmp->next;
+	}
+	str = (char *)malloc(sizeof(char) * (i + 1));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (q->front)
+		str[i++] = dequeue_char(q);
+	str[i] = '\0';
+	return (str);
 }

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 10:45:27 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 13:13:03 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:13:30 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,3 +49,25 @@ void	pipe1(int fd[2])
 		panic("pipe");
 }
 
+void	free1(void *ptr)
+{
+	if (ptr)
+		free(ptr);
+	ptr = NULL;
+}
+
+void	free_split(char **array)
+{
+	int	i;
+
+	i = 0;
+	if (!array)
+		return ;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+	array = NULL;
+}
