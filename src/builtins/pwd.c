@@ -1,27 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:50:25 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/26 17:54:00 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/26 17:54:51 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-void	env(t_env_var **env_var_list)
+void	pwd(int *exit_status)
 {
-	t_env_var	*tmp;
+	char	*pwd;
 
-	tmp = *env_var_list;
-	while (tmp)
+	pwd = getcwd(NULL, 0);
+	if (pwd)
 	{
-		if (tmp->value)
-			ft_printf("%s=%s\n", tmp->key, tmp->value);
-		tmp = tmp->next;
+		ft_printf("%s\n", pwd);
+		free(pwd);
+	}
+	else
+	{
+		perror("pwd");
+		*exit_status = 1;
 	}
 }

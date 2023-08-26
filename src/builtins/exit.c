@@ -6,11 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:41:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:50:28 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+#include "../../include/builtins.h"
 
 
 int	is_numeric(const char *str)

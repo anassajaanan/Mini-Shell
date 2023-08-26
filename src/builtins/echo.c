@@ -6,11 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:33:48 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:49:43 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+#include "../../include/builtins.h"
 
 int contains_unbalanced_quotes_echo(char *arg)
 {

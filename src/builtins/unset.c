@@ -6,11 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 17:27:02 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:43:28 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:50:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+#include "../../include/builtins.h"
 
 static int	is_valid_variable_name(char *key)
 {

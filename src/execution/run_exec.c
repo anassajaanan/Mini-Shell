@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:19:50 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:53:38 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,16 +85,16 @@ int	is_builtin_command(t_execcmd *ecmd)
 		
 }
 
-void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list)
+void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list, int exit_status)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
-		;// echo;
+		echo(ecmd->argv, *env_var_list, exit_status);
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
-		;// env;
+		env(env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
-		;// export 
+		export_cmd(ecmd->argv, env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
-		;// unset
+		exit(0);
 	else if (ft_strcmp(ecmd->argv[0], "pwd") == 0)
 		;//pwd
 }
