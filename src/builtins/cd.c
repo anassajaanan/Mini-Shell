@@ -6,11 +6,11 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 09:02:21 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:29:59 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:31:22 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 
 void	change_to_home_directory(int *exit_status, t_env_var *env_var_list)
