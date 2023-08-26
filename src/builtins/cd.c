@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 09:02:21 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:34:53 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:39:24 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,7 @@ void	cd(char **argv, int *exit_status, t_env_var *env_var_list)
 			
 		}
 	}
-	char	*new_path = queue_to_str(&q);
+	char	*new_path = queue_char_to_str(&q);
 	if (chdir(new_path) != 0)
 	{
 		ft_printf_fd(2, "minishell: cd: %s: No such file or directory\n", new_path);

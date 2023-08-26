@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 10:57:34 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:37:50 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <fcntl.h>
 # include <errno.h>
 # include <signal.h>
+# include <limits.h>
 # include <sys/wait.h>
 # include <sys/types.h>
 # include <sys/stat.h>
