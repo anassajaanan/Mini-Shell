@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 09:02:21 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:31:22 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:34:53 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,27 +43,6 @@ static char	*get_variable_name(char *arg)
 	return (ft_substr(arg, 0, i));
 }
 
-char	*queue_to_str(t_queue_char *q)
-{
-	int 						i;
-	char						*path;
-	struct s_queue_node_char	*tmp;
-
-	i = 0;
-	tmp = q->front;
-	while (tmp)
-	{
-		i++;
-		tmp = tmp->next;
-	}
-	path = (char *)malloc(sizeof(char) * (i + 1));
-	i = 0;
-	while (q->front)
-		path[i++] = dequeue_char(q);
-	path[i] = '\0';
-	return (path);
-}
-
 
 void	update_pwd(t_env_var *env_var_list)
 {
@@ -76,7 +55,7 @@ void	update_pwd(t_env_var *env_var_list)
 	
 	while (tmp)
 	{
-		if (strcmp(tmp->key, "PWD") == 0)
+		if (ft_strcmp(tmp->key, "PWD") == 0)
 		{
 			old_pwd = env_var_new(ft_strdup("OLDPWD"), tmp->value);
 			env_var_insert_sorted(&env_var_list, old_pwd);
