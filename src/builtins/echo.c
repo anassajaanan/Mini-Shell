@@ -6,13 +6,13 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:31:33 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 17:33:48 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int contains_unbalanced_quotes(char *arg)
+int contains_unbalanced_quotes_echo(char *arg)
 {
 	int		i;
 	int		tok;
@@ -43,7 +43,7 @@ int	is_valid_echo_command(char **argv)
 	i = 1;
 	while (argv[i])
 	{
-		if (contains_unbalanced_quotes(argv[i]))
+		if (contains_unbalanced_quotes_echo(argv[i]))
 			return (0);
 		i++;
 	}
