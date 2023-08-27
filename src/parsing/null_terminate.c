@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 10:02:01 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 10:14:14 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 09:10:31 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/parsing.h"
 
-static t_cmd	*null_terminate_pipe(t_cmd *cmd)
+static void	null_terminate_pipe(t_cmd *cmd)
 {
 	t_pipecmd	*pcmd;
 
@@ -22,7 +22,7 @@ static t_cmd	*null_terminate_pipe(t_cmd *cmd)
 	null_terminate_command(pcmd->right);
 }
 
-static t_cmd	*null_terminate_redir(t_cmd *cmd)
+static void	null_terminate_redir(t_cmd *cmd)
 {
 	t_redircmd	*rcmd;
 
@@ -43,6 +43,7 @@ static t_cmd	*null_terminate_exec(t_cmd *cmd)
 		*ecmd->eargv[i] = '\0';
 		i++;
 	}
+	return (cmd);
 }
 
 t_cmd	*null_terminate_command(t_cmd *cmd)

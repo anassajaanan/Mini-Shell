@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 12:27:21 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 09:08:47 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	init_env_var_list(char **envp, t_env_var **env_var_list)
 		}
 		else
 			new_node = env_var_new(ft_strdup(envp[i]), NULL);
+		env_var_insert_sorted(env_var_list, new_node);
 		i++;
 	}
 }

@@ -1,24 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   execution.c                                        :+:      :+:    :+:   */
+/*   signals.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/24 10:44:47 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 09:15:14 by aajaanan         ###   ########.fr       */
+/*   Created: 2023/08/27 08:26:20 by aajaanan          #+#    #+#             */
+/*   Updated: 2023/08/27 08:30:40 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
-#include "../../include/execution.h"
+#ifndef SIGNALS_H
+# define SIGNALS_H
 
-void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
-{
-	if (cmd->type == PIPE)
-		run_pipe(cmd, env_var_list, exit_status);
-	else if (cmd->type == REDIR)
-		run_redir(cmd, env_var_list, exit_status);
-	else if (cmd->type == EXEC)
-		run_exec(cmd, env_var_list, exit_status);
-}
+void	signal_handler(int signum);
+void	signal_handler_herdoc(int signum);
+void	signal_handler_input(int signum);
+void	setup_signals(void);
+void	set_signal_handler(t_cmd *tree);
+
+
+#endif /* SIGNALS_H */

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 13:13:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 13:34:49 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 09:57:15 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "../../include/execution.h"
 #include <sys/wait.h>
 
-void	run_cmd(t_cmd *cmd, t_env_var **env_var_list, int *exit_status);
 
 void	execute_left_subtree(t_cmd *cmd, int fd[2], t_env_var **env_var_list, int *exit_status)
 {
@@ -38,7 +37,7 @@ void write_exit_status_to_file(int exit_status)
 {
 	int fd;
 
-	fd = open("exit_status.tmp", O_WRONLY | O_CREAT | O_APPEND, 0777);
+	fd = open("/tmp/exit_status.tmp", O_WRONLY | O_CREAT | O_APPEND, 0777);
 	if (fd < 0)
 	{
 		panic("open");

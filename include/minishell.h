@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/09 14:49:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:51:20 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 08:57:53 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@
 
 # include "../include/colors.h"
 # include "../include/queue.h"
+# include "../include/env.h"
 # include "../include/command.h"
 # include "../include/utility.h"
 # include "../include/parsing.h"
 # include "../include/execution.h"
-# include "../include/env.h"
 # include "../include/builtins.h"
+# include "../include/signals.h"
 
 
 #endif //MINISHELL_H

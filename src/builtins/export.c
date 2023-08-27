@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:50:33 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/26 18:02:36 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	print_environment_variables(t_env_var *env_var_list)
 	}
 }
 
-void	export_cmd(char **args, t_env_var *env_var_list)
+void	exportt(char **args, t_env_var *env_var_list)
 {
 	if (!args[1])
 	{
