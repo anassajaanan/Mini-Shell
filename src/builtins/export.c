@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 14:50:33 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 15:35:18 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static int	is_valid_variable_name(char *key)
 	return (1);
 }
 
-void	handle_export_command_2(char *equal_sign,
+void	add_exported_variable(char *equal_sign,
 	char *key, t_env_var **env_var_list)
 {
 	t_env_var	*new_node;
@@ -107,5 +107,6 @@ void	handle_export_command(char **args,
 			free(key);
 			continue ;
 		}
+		add_exported_variable(equal_sign, key, env_var_list);
 	}
 }
