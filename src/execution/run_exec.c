@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 13:48:22 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:49:38 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list, int exi
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
 		env(env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
-		exportt(ecmd->argv, *env_var_list);
+		export(ecmd->argv, *env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
 		exit(0);
 	else if (ft_strcmp(ecmd->argv[0], "pwd") == 0)

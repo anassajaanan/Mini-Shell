@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 18:02:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:50:33 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	print_environment_variables(t_env_var *env_var_list)
 	}
 }
 
-void	exportt(char **args, t_env_var *env_var_list)
+void	export(char **args, t_env_var *env_var_list)
 {
 	if (!args[1])
 	{
@@ -64,41 +64,48 @@ static int	is_valid_variable_name(char *key)
 	return (1);
 }
 
-void	handle_export_command(char **args, t_env_var **env_var_list, int *exit_status)
+void	handle_export_command_2(char *equal_sign,
+	char *key, t_env_var **env_var_list)
+{
+	t_env_var	*new_node;
+
+	if (!equal_sign)
+	{
+		new_node = env_var_new(key, NULL);
+		env_var_insert_sorted(env_var_list, new_node);
+	}
+	else
+	{
+		new_node = env_var_new(key, ft_strdup(equal_sign + 1));
+		env_var_insert_sorted(env_var_list, new_node);
+	}
+}
+
+void	handle_export_command(char **args,
+	t_env_var **env_var_list, int *exit_status)
 {
 	int			i;
 	char		*key;
 	char		*equal_sign;
-	t_env_var	*new_node;
-	
+
 	if (!args[1])
 	{
 		print_environment_variables(*env_var_list);
 		return ;
 	}
-	i = 1;
-	while (args[i])
+	i = 0;
+	while (args[++i])
 	{
 		equal_sign = ft_strchr(args[i], '=');
 		key = extract_variable_name(args[i], equal_sign);
 		if (!is_valid_variable_name(key))
 		{
-			ft_printf_fd(STDERR_FILENO, "minishell: export: `%s': not a valid identifier\n", args[i]);
+			ft_printf_fd(STDERR_FILENO,
+				"minishell: export: `%s': not a valid identifier\n", args[i]);
 			*exit_status = 1;
 			i++;
 			free(key);
 			continue ;
 		}
-		if (!equal_sign)
-		{
-			new_node = env_var_new(key, NULL);
-			env_var_insert_sorted(env_var_list, new_node);
-		}
-		else
-		{
-			new_node = env_var_new(key, ft_strdup(equal_sign + 1));
-			env_var_insert_sorted(env_var_list, new_node);
-		}
-		i++;
 	}
 }
