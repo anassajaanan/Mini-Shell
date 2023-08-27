@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 13:49:41 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:01:02 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,12 @@ void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit
 	int status;
 	waitpid(-1, &status, 0);
 	get_exit_status(tree, exit_status, status);
+	if (tree->type == EXEC && ft_strcmp(((t_execcmd *)tree)->argv[0], "exit") == 0)
+	{
+		cleanup(tree, buf);
+		free_env_var_list(*env_var_list);
+		exit(*exit_status);
+	}
 	cleanup(tree, buf);
 }
 
