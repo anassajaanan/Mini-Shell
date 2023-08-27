@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 14:01:02 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 14:21:02 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,24 +127,25 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (ft_strlen(buf) == 0)
 		{
-			free(buf);
+			free1(buf);
 			continue ;
 		}
 		if (!validate_command(buf, &exit_status))
 		{
-			free(buf);
+			free1(buf);
 			continue ;
 		}
 		tree = parse_cmd(buf, &exit_status);
 		if (is_built_in_command(tree))
 		{
 			execute_built_in_command((t_execcmd *)tree, &env_var_list, &exit_status);
-			free(buf);
+			free1(buf);
 			free_tree(tree);
 		}
 		else
 			execute_command(tree, buf, &env_var_list, &exit_status);
 	}
+	free1(buf);
 	free_env_var_list(env_var_list);
 	return (exit_status);
 }
