@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 18:02:07 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 19:23:35 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-int	is_numeric(const char *str)
+static int	is_numeric(const char *str)
 {
 	if (*str && (*str == '+' || *str == '-'))
 		str++;
@@ -28,7 +28,7 @@ int	is_numeric(const char *str)
 	return (1);
 }
 
-void	exit_command_2(char *str, t_queue_char *q)
+static void	exit_command_2(char *str, t_queue_char *q)
 {
 	char	tok;
 	int		i;
@@ -49,7 +49,7 @@ void	exit_command_2(char *str, t_queue_char *q)
 	}
 }
 
-void	exit_command_3(char *arg, char **argv)
+static void	exit_command_3(char *arg, char **argv)
 {
 	if (!is_numeric(arg))
 	{
@@ -67,7 +67,7 @@ void	exit_command_3(char *arg, char **argv)
 	}
 }
 
-void	exit_command_4(char *arg)
+static void	exit_command_4(char *arg)
 {
 	long long	exit_code;
 	int			over_under_flow;

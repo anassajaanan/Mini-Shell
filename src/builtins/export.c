@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 07:09:20 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 15:35:18 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 19:22:00 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-void	print_environment_variables(t_env_var *env_var_list)
+static void	print_environment_variables(t_env_var *env_var_list)
 {
 	t_env_var	*current;
 
@@ -28,43 +28,7 @@ void	print_environment_variables(t_env_var *env_var_list)
 	}
 }
 
-void	export(char **args, t_env_var *env_var_list)
-{
-	if (!args[1])
-	{
-		print_environment_variables(env_var_list);
-		return ;
-	}
-}
-
-char	*extract_variable_name(char *arg, char *equal_sign)
-{
-	char	*key;
-
-	if (!equal_sign)
-		return (ft_strdup(arg));
-	key = ft_substr(arg, 0, equal_sign - arg);
-	return (key);
-}
-
-static int	is_valid_variable_name(char *key)
-{
-	int	i;
-
-	i = 0;
-	if (!ft_isalpha(key[i]) && key[i] != '_')
-		return (0);
-	i++;
-	while (key[i])
-	{
-		if (!ft_isalnum(key[i]) && key[i] != '_')
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-void	add_exported_variable(char *equal_sign,
+static void	add_exported_variable(char *equal_sign,
 	char *key, t_env_var **env_var_list)
 {
 	t_env_var	*new_node;
@@ -81,7 +45,7 @@ void	add_exported_variable(char *equal_sign,
 	}
 }
 
-void	handle_export_command(char **args,
+void	export_command(char **args,
 	t_env_var **env_var_list, int *exit_status)
 {
 	int			i;
@@ -108,5 +72,14 @@ void	handle_export_command(char **args,
 			continue ;
 		}
 		add_exported_variable(equal_sign, key, env_var_list);
+	}
+}
+
+void	export(char **args, t_env_var *env_var_list)
+{
+	if (!args[1])
+	{
+		print_environment_variables(env_var_list);
+		return ;
 	}
 }

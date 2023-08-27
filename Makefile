@@ -33,9 +33,12 @@ SRCS		=	src/main.c \
 \
 				src/builtins/cd.c \
 				src/builtins/echo.c \
+				src/builtins/echo_utils.c \
+				src/builtins/echo_helpers.c \
 				src/builtins/env.c \
 				src/builtins/exit.c \
 				src/builtins/export.c \
+				src/builtins/export_utils.c \
 				src/builtins/pwd.c \
 				src/builtins/unset.c \
 \

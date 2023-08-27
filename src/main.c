@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 18:11:52 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 18:21:33 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int is_built_in_command(t_cmd *tree)
 void	execute_built_in_command(t_execcmd *ecmd, t_env_var **env_var_list, int *exit_status)
 {
 	if (ft_strcmp(ecmd->argv[0], "export") == 0)
-		handle_export_command(ecmd->argv, env_var_list, exit_status);
+		export_command(ecmd->argv, env_var_list, exit_status);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
 		unset_env_var(ecmd->argv, env_var_list, exit_status);
 	else if (ft_strcmp(ecmd->argv[0], "cd") == 0)
