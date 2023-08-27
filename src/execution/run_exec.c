@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 09:16:43 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 10:37:50 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,7 @@ void	run_exec(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
 		free1(binary_path);
 		exit(126);
 	}
+	exit(0);
 	free1(binary_path);
 	exit(0);
 }

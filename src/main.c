@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 10:03:29 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 10:44:47 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,13 @@ void	save_child_pid(int pid)
 
 	fd = open("/tmp/child_pid.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
-	{
-		printf("open1\n");
 		panic("open");
-	}
 	if (write(fd, &pid, sizeof(int)) < 0)
 		panic("write");
 	close(fd);
 }
 
-void	get_exit_status(t_cmd *tree, char *buf, int *exit_status, int status)
+void	get_exit_status(t_cmd *tree, int *exit_status, int status)
 {
 	int	fd;
 	
@@ -70,25 +67,15 @@ void	get_exit_status(t_cmd *tree, char *buf, int *exit_status, int status)
 			*exit_status = WTERMSIG(status) + 128;
 		else
 			*exit_status = 1;
-		free(buf);
-		free_tree(tree);
-		unlink("/tmp/child_pid.tmp");
 	}
 	else
 	{
 		fd = open("/tmp/exit_status.tmp", O_RDONLY);
 		if (fd < 0)
-		{
-			printf("open2\n");
 			panic("open");
-		}
 		if (read(fd, exit_status, sizeof(int)) < 0)
 			panic("read");
 		close(fd);
-		free(buf);
-		free_tree(tree);
-		unlink("/tmp/child_pid.tmp");
-		unlink("/tmp/exit_status.tmp");
 	}
 }
 
@@ -110,7 +97,8 @@ void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit
 	}
 	int status;
 	waitpid(-1, &status, 0);
-	get_exit_status(tree, buf, exit_status, status);
+	get_exit_status(tree, exit_status, status);
+	cleanup(tree, buf);
 }
 
 
@@ -132,7 +120,7 @@ int main(int argc, char **argv, char **envp)
 		buf = readline(BCYN "minishell$ " reset);
 		if (!buf)
 		{
-			ft_printf_fd(STDIN_FILENO, "exit\n");
+			ft_printf_fd(STDOUT_FILENO, "exit\n");
 			break;
 		}
 		if (ft_strlen(buf) == 0)
@@ -148,7 +136,6 @@ int main(int argc, char **argv, char **envp)
 		tree = parse_cmd(buf, &exit_status);
 		if (is_built_in_command(tree))
 		{
-			ft_printf("exit command\n");
 			execute_built_in_command((t_execcmd *)tree, &env_var_list, &exit_status);
 			free(buf);
 			free_tree(tree);
@@ -159,3 +146,4 @@ int main(int argc, char **argv, char **envp)
 	free_env_var_list(env_var_list);
 	return (exit_status);
 }
+
