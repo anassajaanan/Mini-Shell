@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 10:37:50 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 13:48:22 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ int	is_builtin_command(t_execcmd *ecmd)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
 		return (1);
+	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
+		return (1);
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
 		return (1);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
@@ -88,6 +90,8 @@ void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list, int exi
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
 		echo(ecmd->argv, *env_var_list, exit_status);
+	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
+		exit_command(ecmd->argv);
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
 		env(env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)

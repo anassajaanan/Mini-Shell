@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:50:28 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 13:47:46 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	is_numeric(const char *str)
 
 
 
-void	exit_command(char **argv, int *exit_status)
+void	exit_command(char **argv)
 {
 	int				i;
 	t_queue_char	q;
@@ -77,7 +77,7 @@ void	exit_command(char **argv, int *exit_status)
 		{
 			ft_printf("exit\n");
 			ft_printf_fd(2, "minishell: exit: too many arguments\n");
-			*exit_status = 1;
+			exit(1);
 		}
 		else
 		{

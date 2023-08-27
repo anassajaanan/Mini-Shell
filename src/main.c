@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 10:44:47 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 13:49:41 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,7 @@ int is_built_in_command(t_cmd *tree)
 	if (tree && tree->type == EXEC)
 	{
 		ecmd = (t_execcmd *)tree;
-		if (ft_strcmp(ecmd->argv[0], "exit") == 0)
-			return (1);
-		else if (ft_strcmp(ecmd->argv[0], "export") == 0)
+		if (ft_strcmp(ecmd->argv[0], "export") == 0)
 			return (1);
 		else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
 			return (1);
@@ -33,9 +31,7 @@ int is_built_in_command(t_cmd *tree)
 
 void	execute_built_in_command(t_execcmd *ecmd, t_env_var **env_var_list, int *exit_status)
 {
-	if (ft_strcmp(ecmd->argv[0], "exit") == 0)
-		exit_command(ecmd->argv, exit_status);
-	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
+	if (ft_strcmp(ecmd->argv[0], "export") == 0)
 		handle_export_command(ecmd->argv, env_var_list, exit_status);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
 		unset_env_var(ecmd->argv, env_var_list, exit_status);
