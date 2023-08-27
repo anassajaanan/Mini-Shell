@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 14:21:02 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/27 18:11:52 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,48 @@ void	cleanup(t_cmd *tree, char *buf)
 	unlink("/tmp/child_pid.tmp");
 }
 
+void	process_quoted_args(t_cmd *cmd)
+{
+	t_execcmd	*ecmd;
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
+
+	if (cmd->type == PIPE)
+	{
+		pcmd = (t_pipecmd *)cmd;
+		process_quoted_args(pcmd->left);
+		process_quoted_args(pcmd->right);
+	}
+	else if (cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		process_quoted_args(rcmd->subcmd);
+	}
+	else if (cmd->type == EXEC)
+	{
+		ecmd = (t_execcmd *)cmd;
+		if (ecmd->argv[0] && (ft_strcmp(ecmd->argv[0], "grep") == 0 || ft_strcmp(ecmd->argv[0], "cat") == 0))
+		{
+			for (int i = 1; ecmd->argv[i]; i++)
+			{
+				if (ecmd->argv[i][0] == '\"' && ecmd->argv[i][ft_strlen(ecmd->argv[i]) - 1] == '\"')
+				{
+					ecmd->argv[i] = ecmd->argv[i] + 1;
+					ecmd->eargv[i] = ecmd->eargv[i] - 1;
+					ecmd->eargv[i][0] = '\0';
+				}
+			}
+		}
+	}
+}
+
 void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit_status)
 {
 	set_signal_handler(tree);
 	if (forking() == 0)
 	{
 		save_child_pid(getpid());
+		process_quoted_args(tree);
 		run_cmd(tree, env_var_list, exit_status);
 	}
 	int status;
