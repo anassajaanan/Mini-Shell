@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 09:38:57 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 10:47:32 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,15 @@ void	handle_variable_substitution(t_execcmd *ecmd, t_env_var **env_var_list)
 	}
 }
 
-void handle_executable_path(t_execcmd *ecmd)
+void handle_executable_path(t_execcmd *ecmd, t_env_var **env_var_list, t_cmd *tree, char *buf)
 {
 	if (ecmd->argv[0] == NULL)
+	{
+		free1(buf);
+		free_tree(tree);
+		free_env_var_list(*env_var_list);
 		exit(0);
+	}
 	else if (ft_strchr("./", ecmd->argv[0][0]))
 	{
 		struct stat	path_stat;
@@ -51,17 +56,26 @@ void handle_executable_path(t_execcmd *ecmd)
 			if (S_ISDIR(path_stat.st_mode))
 			{
 				ft_printf_fd(STDERR_FILENO, "minishell: %s: is a directory\n", ecmd->argv[0]);
+				free1(buf);
+				free_tree(tree);
+				free_env_var_list(*env_var_list);
 				exit(126);
 			}
 			else if (access(ecmd->argv[0], X_OK) != 0)
 			{
 				ft_printf_fd(STDERR_FILENO, "minishell: %s: Permission denied\n", ecmd->argv[0]);
+				free1(buf);
+				free_tree(tree);
+				free_env_var_list(*env_var_list);
 				exit(126);
 			}
 		}
 		else
 		{
 			ft_printf_fd(STDERR_FILENO, "minishell: %s: No such file or directory\n", ecmd->argv[0]);
+			free1(buf);
+			free_tree(tree);
+			free_env_var_list(*env_var_list);
 			exit(127);
 		}
 	}
@@ -143,7 +157,7 @@ void	run_exec(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tre
 	binary_path = NULL;
 	ecmd = (t_execcmd *)cmd;
 	handle_variable_substitution(ecmd, env_var_list);
-	handle_executable_path(ecmd);
+	handle_executable_path(ecmd, env_var_list, tree, buf);
 	if (is_builtin_command(ecmd))
 		execute_builtin_commands(ecmd, env_var_list, *exit_status, tree, buf);
 	else
