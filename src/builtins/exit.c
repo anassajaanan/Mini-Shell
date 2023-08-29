@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 09:34:36 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 15:10:38 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static void	exit_command_2(char *str, t_queue_char *q)
 	}
 }
 
-static void	exit_command_3(char *arg, char **argv, t_env_var **env_var_list, t_cmd *tree, char *buf)
+static void	exit_command_3(char *arg, char **argv, t_params *params)
 {
 	if (!is_numeric(arg))
 	{
@@ -57,24 +57,18 @@ static void	exit_command_3(char *arg, char **argv, t_env_var **env_var_list, t_c
 		ft_printf_fd(2,
 			"minishell: exit: %s: numeric argument required\n", arg);
 		free(arg);
-		free1(buf);
-		free_tree(tree);
-		free_env_var_list(*env_var_list);
-		exit(255);
+		free_exit(params, 255);
 	}
 	else if (argv[2])
 	{
 		ft_printf("exit\n");
 		ft_printf_fd(2, "minishell: exit: too many arguments\n");
 		free(arg);
-		free1(buf);
-		free_tree(tree);
-		free_env_var_list(*env_var_list);
-		exit(1);
+		free_exit(params, 1);
 	}
 }
 
-static void	exit_command_4(char *arg, t_env_var **env_var_list, t_cmd *tree, char *buf)
+static void	exit_command_4(char *arg, t_params *params)
 {
 	long long	exit_code;
 	int			over_under_flow;
@@ -86,19 +80,13 @@ static void	exit_command_4(char *arg, t_env_var **env_var_list, t_cmd *tree, cha
 		ft_printf_fd(2,
 			"minishell: exit: %s: numeric argument required\n", arg);
 		free(arg);
-		free1(buf);
-		free_tree(tree);
-		free_env_var_list(*env_var_list);
-		exit(255);
+		free_exit(params, 255);
 	}
 	free(arg);
-	free1(buf);
-	free_tree(tree);
-	free_env_var_list(*env_var_list);
-	exit(exit_code);
+	free_exit(params, exit_code);
 }
 
-void	exit_command(char **argv, t_env_var **env_var_list, t_cmd *tree, char *buf)
+void	exit_command(char **argv, t_params *params)
 {
 	t_queue_char	q;
 	char			*str;
@@ -111,16 +99,13 @@ void	exit_command(char **argv, t_env_var **env_var_list, t_cmd *tree, char *buf)
 		exit_command_2(str, &q);
 		arg = queue_char_to_str(&q);
 		if (!is_numeric(arg) || argv[2])
-			exit_command_3(arg, argv, env_var_list, tree, buf);
+			exit_command_3(arg, argv, params);
 		else
-			exit_command_4(arg, env_var_list, tree, buf);
+			exit_command_4(arg, params);
 	}
 	else
 	{
 		ft_printf("exit\n");
-		free1(buf);
-		free_tree(tree);
-		free_env_var_list(*env_var_list);
-		exit(0);
+		free_exit(params, 0);
 	}
 }

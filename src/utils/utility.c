@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 10:45:27 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 17:13:30 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 14:43:20 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,21 @@ void	free_split(char **array)
 	}
 	free(array);
 	array = NULL;
+}
+
+void	free_exit(t_params *params, int exit_status)
+{
+	free1(params->buf);
+	free_tree(params->tree);
+	free_env_var_list(params->env_var_list);
+	exit(exit_status);
+}
+
+void	free_panic_exit(t_params *params, char *error, int exit_status)
+{
+	free1(params->buf);
+	free_tree(params->tree);
+	free_env_var_list(params->env_var_list);
+	perror(error);
+	exit(exit_status);
 }

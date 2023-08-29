@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 10:56:22 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 15:45:19 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,12 +75,17 @@ void	get_exit_status(t_cmd *tree, int *exit_status, int status)
 	}
 }
 
-void	cleanup(t_cmd *tree, char *buf)
+void	cleanup_files(void)
 {
-	free(buf);
-	free_tree(tree);
 	unlink("/tmp/exit_status.tmp");
 	unlink("/tmp/child_pid.tmp");
+}
+
+void	cleanup(t_params *params)
+{
+	cleanup_files();
+	free1(params->buf);
+	free_tree(params->tree);
 }
 
 void	process_quoted_args(t_cmd *cmd)
@@ -118,26 +123,26 @@ void	process_quoted_args(t_cmd *cmd)
 	}
 }
 
-void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit_status)
+void	execute_command(t_params *params, int *exit_status)
 {
-	set_signal_handler(tree);
+	set_signal_handler(params->tree);
 	if (forking() == 0)
 	{
 		save_child_pid(getpid());
-		process_quoted_args(tree);
-		run_cmd(tree, env_var_list, exit_status, tree, buf);
+		process_quoted_args(params->tree);
+		run_cmd(params->tree, params, exit_status);
 	}
 	int status;
 	waitpid(-1, &status, 0);
-	get_exit_status(tree, exit_status, status);
-	if (tree->type == EXEC && ft_strcmp(((t_execcmd *)tree)->argv[0], "exit") == 0)
+	get_exit_status(params->tree, exit_status, status);
+	if (params->tree->type == EXEC && ft_strcmp(((t_execcmd *)params->tree)->argv[0], "exit") == 0)
 	{
-		cleanup(tree, buf);
-		free_env_var_list(*env_var_list);
-		exit(*exit_status);
+		cleanup_files();
+		free_exit(params, *exit_status);
 	}
-	cleanup(tree, buf);
+	cleanup(params);
 }
+
 
 int	is_whitespace_string(char *str)
 {
@@ -156,54 +161,43 @@ int	is_whitespace_string(char *str)
 
 int main(int argc, char **argv, char **envp)
 {
-	char		*buf;
-	t_cmd		*tree;
-	t_env_var	*env_var_list;
+	t_params	params;
 	int			exit_status;
 
 	(void)argc;
 	(void)argv;
-	env_var_list = NULL;
-	init_env_var_list(envp, &env_var_list);
+	params.env_var_list = NULL;
+	init_env_var_list(envp, &params.env_var_list);
 	while (1)
 	{
 		setup_signals();
-		
-		// buf = readline(BCYN "minishell$ " reset);
-		ft_printf(BCYN "minishell$ " reset);
-		buf = get_next_line(0);
-		
-		if (!buf)
+		params.buf = readline(BCYN "minishell$ " reset);
+		if (!params.buf)
 		{
 			ft_printf_fd(STDOUT_FILENO, "exit\n");
 			break;
 		}
-		if (ft_strlen(buf) == 0 || is_whitespace_string(buf))
+		if (ft_strlen(params.buf) == 0 || is_whitespace_string(params.buf))
 		{
-			free1(buf);
+			free1(params.buf);
 			continue ;
 		}
-		
-		// add_history(buf);
-		
-		if (!validate_command(buf, &exit_status))
+		if (!validate_command(params.buf, &exit_status))
 		{
-			free1(buf);
+			free1(params.buf);
 			continue ;
 		}
-		tree = parse_cmd(buf, &exit_status);
-		if (is_built_in_command(tree))
+		params.tree = parse_cmd(params.buf, &exit_status);
+		if (is_built_in_command(params.tree))
 		{
-			execute_built_in_command((t_execcmd *)tree, &env_var_list, &exit_status);
-			free1(buf);
-			free_tree(tree);
+			execute_built_in_command((t_execcmd *)params.tree, &params.env_var_list, &exit_status);
+			free1(params.buf);
+			free_tree(params.tree);
 		}
 		else
-			execute_command(tree, buf, &env_var_list, &exit_status);
+			execute_command(&params, &exit_status);
 	}
-	free1(buf);
-	free_env_var_list(env_var_list);
-	// rl_clear_history();
+	free_env_var_list(params.env_var_list);
 	return (exit_status);
 }
 

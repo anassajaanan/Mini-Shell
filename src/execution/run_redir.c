@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:46:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 09:18:23 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 14:55:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/execution.h"
 
-static char	*get_herdoc_input(char *delimiter)
+static char	*get_herdoc_input(char *delimiter, t_params *params)
 {
 	t_queue	q;
 	char	*line;
@@ -21,7 +21,7 @@ static char	*get_herdoc_input(char *delimiter)
 
 	terminal_fd = open("/dev/tty", O_RDONLY);
 	if (terminal_fd < 0)
-		panic("open");
+		free_panic_exit(params, "open", 1);
 	dup2(terminal_fd, STDIN_FILENO);
 	close(terminal_fd);
 	init_queue(&q);
@@ -42,19 +42,19 @@ static char	*get_herdoc_input(char *delimiter)
 	return (queue_to_str(&q));
 }
 
-static void	write_herdoc_input(char *herdoc_input)
+static void	write_herdoc_input(char *herdoc_input, t_params *params)
 {
 	int	fd;
 
 	fd = open("/tmp/herdoc_input.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
-		panic("open");
+		free_panic_exit(params, "open", 1);
 	if (write(fd, herdoc_input, ft_strlen(herdoc_input)) < 0)
-		panic("write");
+		free_panic_exit(params, "write", 1);
 	close(fd);
 }
 
-static void	open_redirection_file(t_redircmd *rcmd)
+static void	open_redirection_file(t_redircmd *rcmd, t_params *params)
 {
 	char	*file;
 	
@@ -64,18 +64,18 @@ static void	open_redirection_file(t_redircmd *rcmd)
 		if (open(file, rcmd->mode, 0644) < 0)
 		{
 			free(file);
-			panic("open");
+			free_panic_exit(params, "open", 1);
 		}
 		free(file);
 	}
 	else
 	{
 		if (open(rcmd->file, rcmd->mode, 0644) < 0)
-			panic("open");
+			free_panic_exit(params, "open", 1);
 	}
 }
 
-void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
+void	run_redir(t_cmd *cmd, t_params *params, int *exit_status)
 {
 	t_redircmd		*rcmd;
 	char			*herdoc_input;
@@ -86,16 +86,16 @@ void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tr
 	if (rcmd->r_type != '%')
 	{
 		close(rcmd->fd);
-		open_redirection_file(rcmd); 
+		open_redirection_file(rcmd, params); 
 	}
 	else
 	{
-		herdoc_input = get_herdoc_input(rcmd->file);
-		write_herdoc_input(herdoc_input);
+		herdoc_input = get_herdoc_input(rcmd->file, params);
+		write_herdoc_input(herdoc_input, params);
 		free(herdoc_input);
 		close(rcmd->fd);
 		if (open("/tmp/herdoc_input.tmp", rcmd->mode, 0644) < 0)
-			panic("open");
+			free_panic_exit(params, "open", 1);
 	}
-	run_cmd(rcmd->subcmd, env_var_list, exit_status, tree, buf);
+	run_cmd(rcmd->subcmd, params, exit_status);
 }

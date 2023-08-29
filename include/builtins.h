@@ -6,16 +6,15 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 17:44:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 09:43:27 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 15:47:29 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BUILTINS_H
 # define BUILTINS_H
 
-# include "../include/env.h"
+# include "../include/minishell.h"
 # include "../lib/libft/libft.h"
-# include "../include/command.h"
 
 // #=====================# echo #=====================#
 // ******* echo_utils.c ******** //
@@ -64,7 +63,7 @@ void	get_new_path(char *path, int *exit_status, t_env_var *env_var_list, t_queue
 void	cd(char **argv, int *exit_status, t_env_var *env_var_list);
 
 // #=====================# exit #=====================#
-void	exit_command(char **argv, t_env_var **env_var_list, t_cmd *tree, char *buf);
+void	exit_command(char **argv, t_params *params);
 
 // #=====================# pwd #=====================#
 void	pwd(int *exit_status);
