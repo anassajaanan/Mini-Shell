@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 10:45:13 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 10:56:22 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,11 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		setup_signals();
+		
 		// buf = readline(BCYN "minishell$ " reset);
 		ft_printf(BCYN "minishell$ " reset);
 		buf = get_next_line(0);
+		
 		if (!buf)
 		{
 			ft_printf_fd(STDOUT_FILENO, "exit\n");
@@ -181,7 +183,9 @@ int main(int argc, char **argv, char **envp)
 			free1(buf);
 			continue ;
 		}
-		add_history(buf);
+		
+		// add_history(buf);
+		
 		if (!validate_command(buf, &exit_status))
 		{
 			free1(buf);
