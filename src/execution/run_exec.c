@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 14:49:38 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 09:38:57 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,18 +86,23 @@ int	is_builtin_command(t_execcmd *ecmd)
 		
 }
 
-void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list, int exit_status)
+void	execute_builtin_commands(t_execcmd *ecmd, t_env_var **env_var_list, int exit_status, t_cmd *tree, char *buf)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
 		echo(ecmd->argv, *env_var_list, exit_status);
 	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
-		exit_command(ecmd->argv);
+		exit_command(ecmd->argv, env_var_list, tree, buf);
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
 		env(env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
 		export(ecmd->argv, *env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
+	{
+		free1(buf);
+		free_tree(tree);
+		free_env_var_list(*env_var_list);
 		exit(0);
+	}
 	else if (ft_strcmp(ecmd->argv[0], "pwd") == 0)
 		pwd(&exit_status);
 }
@@ -129,7 +134,7 @@ char	*find_command_path(char *cmd, char *path_var)
 	return (NULL);
 }
 
-void	run_exec(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
+void	run_exec(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
 {
 	t_execcmd	*ecmd;
 	char		*path_var;
@@ -140,26 +145,45 @@ void	run_exec(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
 	handle_variable_substitution(ecmd, env_var_list);
 	handle_executable_path(ecmd);
 	if (is_builtin_command(ecmd))
-		execute_builtin_commands(ecmd, env_var_list, *exit_status);
+		execute_builtin_commands(ecmd, env_var_list, *exit_status, tree, buf);
 	else
 	{
+		if (access(ecmd->argv[0], X_OK) == 0)
+		{
+			execve(ecmd->argv[0], ecmd->argv, NULL);
+			free1(buf);
+			free_tree(tree);
+			free_env_var_list(*env_var_list);
+			exit(126);
+		}
 		path_var = getenv_value("PATH", *env_var_list);
 		if (path_var == NULL)
 		{
 			ft_printf_fd(STDERR_FILENO, "minishell: %s: No such file or directory\n", ecmd->argv[0]);
+			free1(buf);
+			free_tree(tree);
+			free_env_var_list(*env_var_list);
 			exit(127);
 		}
 		binary_path = find_command_path(ecmd->argv[0], path_var);
 		if (binary_path == NULL)
 		{
 			ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n", ecmd->argv[0]);
+			free1(buf);
+			free_tree(tree);
+			free_env_var_list(*env_var_list);
 			exit(127);
 		}
 		execve(binary_path, ecmd->argv, NULL);
 		free1(binary_path);
+		free1(buf);
+		free_tree(tree);
+		free_env_var_list(*env_var_list);
 		exit(126);
 	}
-	exit(0);
 	free1(binary_path);
+	free1(buf);
+	free_tree(tree);
+	free_env_var_list(*env_var_list);
 	exit(0);
 }

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:46:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 09:17:28 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 09:18:23 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static void	open_redirection_file(t_redircmd *rcmd)
 	}
 }
 
-void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
+void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
 {
 	t_redircmd		*rcmd;
 	char			*herdoc_input;
@@ -97,5 +97,5 @@ void	run_redir(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
 		if (open("/tmp/herdoc_input.tmp", rcmd->mode, 0644) < 0)
 			panic("open");
 	}
-	run_cmd(rcmd->subcmd, env_var_list, exit_status);
+	run_cmd(rcmd->subcmd, env_var_list, exit_status, tree, buf);
 }

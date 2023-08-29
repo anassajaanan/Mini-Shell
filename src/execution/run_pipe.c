@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 13:13:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 10:41:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 09:42:28 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,21 @@
 #include <sys/wait.h>
 
 
-void	execute_left_subtree(t_cmd *cmd, int fd[2], t_env_var **env_var_list, int *exit_status)
+void	execute_left_subtree(t_cmd *cmd, int fd[2], t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
 {
 	close(fd[0]);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
-	run_cmd(cmd, env_var_list, exit_status);
+	run_cmd(cmd, env_var_list, exit_status, tree, buf);
 	exit(0);
 }
 
-void	execute_right_subtree(t_cmd *cmd, int fd[2], t_env_var **env_var_list, int *exit_status)
+void	execute_right_subtree(t_cmd *cmd, int fd[2], t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
 {
 	close(fd[1]);
 	dup2(fd[0], STDIN_FILENO);
 	close(fd[0]);
-	run_cmd(cmd, env_var_list, exit_status);
+	run_cmd(cmd, env_var_list, exit_status, tree, buf);
 	exit(0);
 }
 
@@ -45,7 +45,7 @@ void write_exit_status_to_file(int exit_status)
 	close(fd);
 }
 
-void	run_pipe(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
+void	run_pipe(t_cmd *cmd, t_env_var **env_var_list, int *exit_status, t_cmd *tree, char *buf)
 {
 	int			fd[2];
 	int			pid1;
@@ -56,9 +56,9 @@ void	run_pipe(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
 	pcmd = (t_pipecmd *)cmd;
 	pipe1(fd);
 	if ((pid1 = forking()) == 0)
-		execute_left_subtree(pcmd->left, fd, env_var_list, exit_status);
+		execute_left_subtree(pcmd->left, fd, env_var_list, exit_status, tree, buf);
 	if ((pid2 = forking()) == 0)
-		execute_right_subtree(pcmd->right, fd, env_var_list, exit_status);
+		execute_right_subtree(pcmd->right, fd, env_var_list, exit_status, tree, buf);
 	close(fd[0]);
 	close(fd[1]);
 	signal(SIGINT, SIG_IGN);
@@ -72,4 +72,7 @@ void	run_pipe(t_cmd *cmd, t_env_var **env_var_list, int *exit_status)
 		*exit_status = 1;
 	}
 	write_exit_status_to_file(*exit_status);
+	free1(buf);
+	free_tree(tree);
+	free_env_var_list(*env_var_list);
 }

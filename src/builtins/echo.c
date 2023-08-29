@@ -6,22 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 19:32:47 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 09:01:13 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
-
-static void	invalid_echo(char **argv)
-{
-	if (!is_valid_echo_command(argv))
-	{
-		ft_printf_fd
-			(STDERR_FILENO, "minishell: syntax error: unbalanced quotes\n");
-		exit(258);
-	}
-}
 
 static void	echo_2(char *arg, t_env_var *env_var_list, int exit_status)
 {
@@ -47,7 +37,6 @@ void	echo(char **argv, t_env_var *env_var_list, int exit_status)
 	int		new_line;
 	char	*arg;
 
-	invalid_echo(argv);
 	checking_newline_flag_quotes(&i, &new_line, argv);
 	while (argv[i])
 	{

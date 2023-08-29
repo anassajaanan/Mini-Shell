@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 08:31:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 09:36:28 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 08:57:08 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,17 @@ void	free_tree(t_cmd *cmd)
 		pcmd = (t_pipecmd *)cmd;
 		free_tree(pcmd->left);
 		free_tree(pcmd->right);
-		if (pcmd)
-			free(pcmd);
+		free1(pcmd);
 	}
 	else if (cmd && cmd->type == REDIR)
 	{
 		rcmd = (t_redircmd *)cmd;
 		free_tree(rcmd->subcmd);
-		if (rcmd)
-			free(rcmd);
+		free1(rcmd);
 	}
 	else if (cmd && cmd->type == EXEC)
 	{
 		ecmd = (t_execcmd *)cmd;
-		if (ecmd)
-			free(ecmd);
+		free1(ecmd);
 	}
 }

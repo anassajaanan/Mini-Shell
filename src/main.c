@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 18:21:33 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/29 09:50:11 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit
 	{
 		save_child_pid(getpid());
 		process_quoted_args(tree);
-		run_cmd(tree, env_var_list, exit_status);
+		run_cmd(tree, env_var_list, exit_status, tree, buf);
 	}
 	int status;
 	waitpid(-1, &status, 0);
@@ -139,6 +139,19 @@ void	execute_command(t_cmd *tree, char *buf, t_env_var **env_var_list, int *exit
 	cleanup(tree, buf);
 }
 
+int	is_whitespace_string(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (!is_whitespace(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 
 int main(int argc, char **argv, char **envp)
@@ -161,11 +174,12 @@ int main(int argc, char **argv, char **envp)
 			ft_printf_fd(STDOUT_FILENO, "exit\n");
 			break;
 		}
-		if (ft_strlen(buf) == 0)
+		if (ft_strlen(buf) == 0 || is_whitespace_string(buf))
 		{
 			free1(buf);
 			continue ;
 		}
+		add_history(buf);
 		if (!validate_command(buf, &exit_status))
 		{
 			free1(buf);
@@ -183,6 +197,7 @@ int main(int argc, char **argv, char **envp)
 	}
 	free1(buf);
 	free_env_var_list(env_var_list);
+	rl_clear_history();
 	return (exit_status);
 }
 
