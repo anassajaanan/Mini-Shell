@@ -21,14 +21,14 @@ typedef struct s_queue_node
 
 typedef struct s_queue
 {
-	t_queue_node	*front;
-	t_queue_node	*rear;
-}					t_queue;
+	t_queue_node		*front;
+	t_queue_node		*rear;
+}						t_queue;
 
-void	init_queue(t_queue *q);
-void	enqueue(t_queue *q, void *val);
-void	*dequeue(t_queue *q);
-char	*queue_to_str(t_queue *q);
-void	free_queue(t_queue *q);
+void					init_queue(t_queue *q);
+void					enqueue(t_queue *q, void *val);
+void					*dequeue(t_queue *q);
+char					*queue_to_str(t_queue *q);
+void					free_queue(t_queue *q);
 
-#endif //QUEUE_H
+#endif // QUEUE_H

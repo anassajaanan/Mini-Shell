@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:39:45 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 20:13:19 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		setup_signals();
-		params.buf = readline(BCYN "minishell$ " reset);
+		params.buf = readline(BCYN "minishell$ " RESET);
 		if (!params.buf)
 		{
 			ft_printf_fd(STDOUT_FILENO, "exit\n");

@@ -19,5 +19,4 @@ void	signal_handler_input(int signum);
 void	setup_signals(void);
 void	set_signal_handler(t_cmd *tree);
 
-
 #endif /* SIGNALS_H */
