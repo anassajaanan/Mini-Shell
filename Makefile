@@ -1,7 +1,7 @@
 NAME		=	minishell
 
 CC			=	gcc
-CFLAGS		=	-Wall -Wextra -Werror -g -fsanitize=address
+CFLAGS		=	-Wall -Wextra -Werror -g
 
 ifeq ($(shell uname -p), i386)
 	LIB_FLAGS	=	-L./lib/libft -lft -L/usr/local/Cellar/readline/8.1/lib -lreadline
@@ -26,8 +26,9 @@ SRCS		=	src/main.c \
 				src/parsing/validate_helpers.c \
 				src/parsing/validate.c \
 \
-				src/execution/execution.c \
+				src/execution/run_cmd.c \
 				src/execution/run_exec.c \
+				src/execution/run_exec_utils.c \
 				src/execution/run_pipe.c \
 				src/execution/run_redir.c \
 				src/execution/run_redir_utils.c \
@@ -47,6 +48,7 @@ SRCS		=	src/main.c \
 \
 				src/utils/queue.c \
 				src/utils/utility.c \
+				src/utils/free.c \
 
 
 

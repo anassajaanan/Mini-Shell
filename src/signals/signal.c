@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 08:25:55 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/27 09:37:21 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 20:00:34 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,21 @@ void	signal_handler_herdoc(int signum)
 {
 	int	fd;
 	int	child_pid;
-	
+
 	if (signum == SIGINT)
 	{
 		ft_printf("\n");
 		fd = open("/tmp/child_pid.tmp", O_RDONLY);
 		if (fd < 0)
-			panic("open");
+		{
+			perror("open");
+			exit(1);
+		}
 		if (read(fd, &child_pid, sizeof(int)) < 0)
-			panic("read");
+		{
+			perror("read");
+			exit(1);
+		}
 		close(fd);
 		kill(child_pid, SIGKILL);
 	}
@@ -65,16 +71,16 @@ void	setup_signals(void)
 	signal(SIGQUIT, signal_handler);
 }
 
-void set_signal_handler(t_cmd *tree)
+void	set_signal_handler(t_cmd *tree)
 {
-    if (tree && tree->type == REDIR)
+	if (tree && tree->type == REDIR)
 	{
-        signal(SIGINT, signal_handler_herdoc);
-        signal(SIGQUIT, signal_handler_herdoc);
-    }
+		signal(SIGINT, signal_handler_herdoc);
+		signal(SIGQUIT, signal_handler_herdoc);
+	}
 	else
 	{
-        signal(SIGINT, signal_handler_input);
-        signal(SIGQUIT, signal_handler_input);
-    }
+		signal(SIGINT, signal_handler_input);
+		signal(SIGQUIT, signal_handler_input);
+	}
 }

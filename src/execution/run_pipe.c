@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 13:13:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 14:49:52 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 19:45:25 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 #include "../../include/execution.h"
 #include <sys/wait.h>
 
-
-void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params, int *exit_status)
+void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params,
+	int *exit_status)
 {
 	close(fd[0]);
 	dup2(fd[1], STDOUT_FILENO);
@@ -24,7 +24,8 @@ void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params, int *exit_sta
 	exit(0);
 }
 
-void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params, int *exit_status)
+void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params,
+	int *exit_status)
 {
 	close(fd[1]);
 	dup2(fd[0], STDIN_FILENO);
@@ -33,9 +34,9 @@ void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params, int *exit_st
 	exit(0);
 }
 
-void write_exit_status_to_file(t_params *params, int exit_status)
+void	write_exit_status_to_file(t_params *params, int exit_status)
 {
-	int fd;
+	int	fd;
 
 	fd = open("/tmp/exit_status.tmp", O_WRONLY | O_CREAT | O_APPEND, 0777);
 	if (fd < 0)
@@ -43,6 +44,12 @@ void write_exit_status_to_file(t_params *params, int exit_status)
 	if (write(fd, &exit_status, sizeof(int)) < 0)
 		free_panic_exit(params, "write", 1);
 	close(fd);
+}
+
+void	set_signals(void)
+{
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	run_pipe(t_cmd *cmd, t_params *params, int *exit_status)
@@ -54,24 +61,22 @@ void	run_pipe(t_cmd *cmd, t_params *params, int *exit_status)
 	t_pipecmd	*pcmd;
 
 	pcmd = (t_pipecmd *)cmd;
-	pipe1(fd);
-	if ((pid1 = forking()) == 0)
+	pipe1(fd, params);
+	pid1 = forking(params);
+	if (pid1 == 0)
 		execute_left_subtree(pcmd->left, fd, params, exit_status);
-	if ((pid2 = forking()) == 0)
+	pid2 = forking(params);
+	if (pid2 == 0)
 		execute_right_subtree(pcmd->right, fd, params, exit_status);
 	close(fd[0]);
 	close(fd[1]);
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
+	set_signals();
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, &status, 0);
 	if (WIFEXITED(status))
-	{
 		*exit_status = WEXITSTATUS(status);
-	} else {
+	else
 		*exit_status = 1;
-	}
 	write_exit_status_to_file(params, *exit_status);
 	free_exit(params, *exit_status);
 }
-

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:46:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/30 08:44:40 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 19:49:57 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ static char	*get_herdoc_input(char *delimiter, t_params *params)
 		ft_printf_fd(STDERR_FILENO, "> ");
 		line = get_next_line(0);
 		if (line == NULL)
-			break;
-		if (ft_strlen(line) == ft_strlen(delimiter) + 1 &&
-			ft_strncmp(line, delimiter, ft_strlen(line) - 1) == 0)
+			break ;
+		if (ft_strlen(line) == ft_strlen(delimiter) + 1
+			&& ft_strncmp(line, delimiter, ft_strlen(line) - 1) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
 		enqueue(&q, line);
 	}
@@ -58,7 +58,7 @@ void	run_redir(t_cmd *cmd, t_params *params, int *exit_status)
 {
 	t_redircmd		*rcmd;
 	char			*herdoc_input;
-	
+
 	rcmd = (t_redircmd *)cmd;
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);

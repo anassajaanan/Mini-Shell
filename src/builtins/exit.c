@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 14:30:50 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 19:57:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	exit_command(char **argv, t_params *params)
 {
 	long long	exit_code;
 	int			over_under_flow;
-	
+
 	if (argv[1])
 	{
 		if (!is_numeric(argv[1]))
@@ -56,7 +56,6 @@ void	exit_command(char **argv, t_params *params)
 			handle_too_many_args(params);
 		else
 		{
-			
 			ft_printf("exit\n");
 			exit_code = ft_atoll(argv[1], &over_under_flow);
 			if (over_under_flow)

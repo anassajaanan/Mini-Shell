@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 17:32:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 09:49:03 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 20:10:07 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	validate_redirection(char **ps, char *es, int *exit_status)
 
 int	validate_pipe(char **ps, char *es, int *exit_status)
 {
-	int tok;
+	int	tok;
 
 	tok = get_next_token(ps, es, 0, 0);
 	if (tok == '|' || tok == '\0')

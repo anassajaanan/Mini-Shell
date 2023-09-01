@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 14:53:18 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 19:39:45 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,19 +39,19 @@ void	execute_built_in_command(t_execcmd *ecmd, t_env_var **env_var_list, int *ex
 		cd(ecmd->argv, exit_status, *env_var_list);
 }
 
-void	save_child_pid(int pid)
+void	save_child_pid(int pid, t_params *params)
 {
 	int	fd;
 
 	fd = open("/tmp/child_pid.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
-		panic("open");
+		free_panic_exit(params, "open", 1);
 	if (write(fd, &pid, sizeof(int)) < 0)
-		panic("write");
+		free_panic_exit(params, "write", 1);
 	close(fd);
 }
 
-void	get_exit_status(t_cmd *tree, int *exit_status, int status)
+void	get_exit_status(t_cmd *tree, t_params *params, int *exit_status, int status)
 {
 	int	fd;
 	
@@ -68,9 +68,9 @@ void	get_exit_status(t_cmd *tree, int *exit_status, int status)
 	{
 		fd = open("/tmp/exit_status.tmp", O_RDONLY);
 		if (fd < 0)
-			panic("open");
+			free_panic_exit(params, "open", 1);
 		if (read(fd, exit_status, sizeof(int)) < 0)
-			panic("read");
+			free_panic_exit(params, "read", 1);
 		close(fd);
 	}
 }
@@ -94,15 +94,14 @@ void	cleanup(t_params *params)
 void	execute_command(t_params *params, int *exit_status)
 {
 	set_signal_handler(params->tree);
-	if (forking() == 0)
+	if (forking(params) == 0)
 	{
-		save_child_pid(getpid());
-		// process_quoted_args(params->tree);
+		save_child_pid(getpid(), params);
 		run_cmd(params->tree, params, exit_status);
 	}
 	int status;
 	waitpid(-1, &status, 0);
-	get_exit_status(params->tree, exit_status, status);
+	get_exit_status(params->tree, params, exit_status, status);
 	if (params->tree->type == EXEC && ft_strcmp(((t_execcmd *)params->tree)->argv[0], "exit") == 0)
 	{
 		cleanup_files();
@@ -183,14 +182,7 @@ int main(int argc, char **argv, char **envp)
 		}
 		params.tree = parse_cmd(params.buf, &exit_status);
 		process_args(params.tree, &params, &exit_status);
-		
-		// display_tree(params.tree);
-		
-		// free1(params.buf);
-		// free_tree(params.tree);
-		// free_queue(&params.args_queue);
 
-		
 		if (is_built_in_command(params.tree))
 		{
 			execute_built_in_command((t_execcmd *)params.tree, &params.env_var_list, &exit_status);

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:02:46 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/30 08:32:08 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 20:01:09 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*queue_to_str(t_queue *q)
 	char			*str;
 	char			*line;
 	t_queue_node	*tmp;
-	
+
 	len = 0;
 	tmp = q->front;
 	while (tmp)

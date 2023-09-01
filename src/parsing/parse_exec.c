@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 08:07:14 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 09:44:29 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 20:09:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	parse_exec_arg(t_execcmd **ecmd, char **ps, char *es, int *argc)
 	int		tok;
 	char	*q;
 	char	*eq;
-	
+
 	tok = get_next_token(ps, es, &q, &eq);
 	if (tok == '\0')
 		return (0);
