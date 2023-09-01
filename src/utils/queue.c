@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:02:46 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/24 16:52:23 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/30 08:32:08 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,6 @@ void	*dequeue(t_queue *q)
 	return (val);
 }
 
-int	queue_is_empty(t_queue *q)
-{
-	if (!q->front)
-		return (1);
-	return (0);
-}
-
 char	*queue_to_str(t_queue *q)
 {
 	int				len;
@@ -82,4 +75,17 @@ char	*queue_to_str(t_queue *q)
 		free(line);
 	}
 	return (str);
+}
+
+void	free_queue(t_queue *q)
+{
+	t_queue_node	*tmp;
+
+	while (q->front)
+	{
+		tmp = q->front;
+		q->front = q->front->next;
+		free1(tmp->val);
+		free1(tmp);
+	}
 }

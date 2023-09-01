@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 10:46:28 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 15:47:42 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 14:46:47 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "../include/minishell.h"
 
 int		is_whitespace(char c);
+int	is_whitespace_string(char *str);
 void	panic(char *s);
 void	panic_exit(int status, char *s);
 int		forking(void);

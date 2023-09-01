@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 17:32:19 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/23 18:21:18 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/08/30 08:48:51 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	contains_unbalanced_quotes(char *buf, int *exit_status)
 			if (!buf[i])
 			{
 				ft_printf_fd(STDERR_FILENO, "minishell: unexpected EOF while looking \
-for matching `%c'", tok);
+for matching `%c'\n", tok);
 				*exit_status = 258;
 				return (1);
 			}

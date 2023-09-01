@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 15:10:38 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 14:30:50 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,84 +28,44 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-static void	exit_command_2(char *str, t_queue_char *q)
+void	handle_non_numeric_arg(char *arg, t_params *params)
 {
-	char	tok;
-	int		i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\'' || str[i] == '\"')
-		{
-			tok = str[i++];
-			while (str[i] && str[i] != tok)
-				enqueue_char(q, str[i++]);
-			if (str[i] == tok)
-				i++;
-		}
-		else
-			enqueue_char(q, str[i++]);
-	}
-}
-
-static void	exit_command_3(char *arg, char **argv, t_params *params)
-{
-	if (!is_numeric(arg))
-	{
-		ft_printf("exit\n");
-		ft_printf_fd(2,
-			"minishell: exit: %s: numeric argument required\n", arg);
-		free(arg);
-		free_exit(params, 255);
-	}
-	else if (argv[2])
-	{
-		ft_printf("exit\n");
-		ft_printf_fd(2, "minishell: exit: too many arguments\n");
-		free(arg);
-		free_exit(params, 1);
-	}
-}
-
-static void	exit_command_4(char *arg, t_params *params)
-{
-	long long	exit_code;
-	int			over_under_flow;
-
 	ft_printf("exit\n");
-	exit_code = ft_atoll(arg, &over_under_flow);
-	if (over_under_flow)
-	{
-		ft_printf_fd(2,
-			"minishell: exit: %s: numeric argument required\n", arg);
-		free(arg);
-		free_exit(params, 255);
-	}
-	free(arg);
-	free_exit(params, exit_code);
+	ft_printf_fd(STDERR_FILENO,
+		"minishell: exit: %s: numeric argument required\n", arg);
+	free_exit(params, 255);
+}
+
+void	handle_too_many_args(t_params *params)
+{
+	ft_printf("exit\n");
+	ft_printf_fd(STDERR_FILENO, "minishell: exit: too many arguments\n");
+	free_exit(params, 1);
 }
 
 void	exit_command(char **argv, t_params *params)
 {
-	t_queue_char	q;
-	char			*str;
-	char			*arg;
-
+	long long	exit_code;
+	int			over_under_flow;
+	
 	if (argv[1])
 	{
-		init_queue_char(&q);
-		str = argv[1];
-		exit_command_2(str, &q);
-		arg = queue_char_to_str(&q);
-		if (!is_numeric(arg) || argv[2])
-			exit_command_3(arg, argv, params);
+		if (!is_numeric(argv[1]))
+			handle_non_numeric_arg(argv[1], params);
+		else if (argv[2])
+			handle_too_many_args(params);
 		else
-			exit_command_4(arg, params);
-	}
-	else
-	{
-		ft_printf("exit\n");
-		free_exit(params, 0);
+		{
+			
+			ft_printf("exit\n");
+			exit_code = ft_atoll(argv[1], &over_under_flow);
+			if (over_under_flow)
+			{
+				ft_printf_fd(STDERR_FILENO,
+					"minishell: exit: %s: numeric argument required\n", argv[1]);
+				free_exit(params, 255);
+			}
+			free_exit(params, exit_code);
+		}
 	}
 }

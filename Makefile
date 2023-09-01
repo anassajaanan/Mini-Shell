@@ -1,7 +1,7 @@
 NAME		=	minishell
 
 CC			=	gcc
-CFLAGS		=	-Wall -Wextra -Werror -g
+CFLAGS		=	-Wall -Wextra -Werror -g -fsanitize=address
 
 ifeq ($(shell uname -p), i386)
 	LIB_FLAGS	=	-L./lib/libft -lft -L/usr/local/Cellar/readline/8.1/lib -lreadline
@@ -13,6 +13,7 @@ endif
 
 SRCS		=	src/main.c \
 				src/command.c \
+				src/process_args.c \
 \
 				src/env/env_var.c \
 				src/env/env_var_utils.c \
@@ -35,8 +36,6 @@ SRCS		=	src/main.c \
 				src/builtins/cd_utils.c \
 				src/builtins/cd_helpers.c \
 				src/builtins/echo.c \
-				src/builtins/echo_utils.c \
-				src/builtins/echo_helpers.c \
 				src/builtins/env.c \
 				src/builtins/exit.c \
 				src/builtins/export.c \

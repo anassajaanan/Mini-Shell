@@ -6,48 +6,43 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 15:04:51 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 14:32:51 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-static void	echo_2(char *arg, t_env_var *env_var_list, int exit_status)
+int	is_newline_flag(char *str)
 {
-	int	j;
+	int	i;
 
-	j = 0;
-	while (arg[j])
+	i = 1;
+	if (str[0] == '-')
 	{
-		if (arg[j] == '\'')
-			single_quote(&j, arg);
-		else if (arg[j] == '\"')
-			double_quote(&j, arg, exit_status, env_var_list);
-		else if (arg[j] == '$')
-			dollar_sign(&j, arg, exit_status, env_var_list);
-		else
-			ft_printf("%c", arg[j++]);
+		while (str[i] && str[i] == 'n')
+			i++;
+		if (str[i] == '\0')
+			return (1);
 	}
+	return (0);
 }
 
-void	echo(char **argv, t_env_var *env_var_list, int exit_status)
+void	echo(char **argv)
 {
 	int		i;
 	int		new_line;
-	char	*arg;
 
-	checking_newline_flag_quotes(&i, &new_line, argv);
+	i = 1;
+	new_line = 1;
+	while (argv[i] && is_newline_flag(argv[i]))
+	{
+		new_line = 0;
+		i++;
+	}
 	while (argv[i])
 	{
-		arg = argv[i];
-		if (ft_strcmp(arg, "~") == 0)
-		{
-			ft_printf("%s", getenv_value("HOME", env_var_list));
-			i++;
-			continue ;
-		}
-		echo_2(arg, env_var_list, exit_status);
+		ft_printf("%s", argv[i]);
 		if (argv[i++ + 1])
 			ft_printf(" ");
 	}

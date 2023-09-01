@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 15:19:18 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 15:36:03 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,27 +15,18 @@
 
 void	handle_variable_substitution(t_execcmd *ecmd, t_env_var **env_var_list)
 {
-	int		i;
-	char	*value;
+	int	i;
 	
-	while (ecmd->argv[0] && ecmd->argv[0][0] == '$' && !ft_strchr("?\0", ecmd->argv[0][1]))
+	(void)env_var_list;
+	while (ecmd->argv[0] && ecmd->argv[0][0] == '\0')
 	{
-		value = getenv_value(ecmd->argv[0] + 1, *env_var_list);
-		if (value)
+		i = 0;
+		while (ecmd->argv[i] && ecmd->argv[i + 1])
 		{
-			ecmd->argv[0] = value;
-			break;
+			ecmd->argv[i] = ecmd->argv[i + 1];
+			i++;
 		}
-		else
-		{
-			i = 0;
-			while (ecmd->argv[i] && ecmd->argv[i + 1])
-			{
-				ecmd->argv[i] = ecmd->argv[i + 1];
-				i++;
-			}
-			ecmd->argv[i] = NULL;
-		}
+		ecmd->argv[i] = NULL;
 	}
 }
 
@@ -89,7 +80,7 @@ int	is_builtin_command(t_execcmd *ecmd)
 void	execute_builtin_commands(t_execcmd *ecmd, t_params *params, int exit_status)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
-		echo(ecmd->argv, params->env_var_list, exit_status);
+		echo(ecmd->argv);
 	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
 		exit_command(ecmd->argv, params);
 	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
@@ -149,7 +140,8 @@ void	run_exec(t_cmd *cmd, t_params *params, int *exit_status)
 		if (access(ecmd->argv[0], X_OK) == 0)
 		{
 			execve(ecmd->argv[0], ecmd->argv, NULL);
-			free_exit(params, 126);
+			ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n", ecmd->argv[0]);
+			free_exit(params, 127);
 		}
 		path_var = getenv_value("PATH", params->env_var_list);
 		if (path_var == NULL)
@@ -167,5 +159,4 @@ void	run_exec(t_cmd *cmd, t_params *params, int *exit_status)
 		free1(binary_path);
 		free_exit(params, 126);
 	}
-	
 }

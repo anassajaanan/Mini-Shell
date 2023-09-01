@@ -1,0 +1,10 @@
+Makefile
+dsds~
+include
+leaks.sh
+lib
+minishell
+minishell_tester
+readline.supp
+src
+tests

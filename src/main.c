@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 15:45:19 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 14:53:18 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,42 +86,10 @@ void	cleanup(t_params *params)
 	cleanup_files();
 	free1(params->buf);
 	free_tree(params->tree);
+	free_queue(&params->args_queue);
 }
 
-void	process_quoted_args(t_cmd *cmd)
-{
-	t_execcmd	*ecmd;
-	t_redircmd	*rcmd;
-	t_pipecmd	*pcmd;
 
-	if (cmd->type == PIPE)
-	{
-		pcmd = (t_pipecmd *)cmd;
-		process_quoted_args(pcmd->left);
-		process_quoted_args(pcmd->right);
-	}
-	else if (cmd->type == REDIR)
-	{
-		rcmd = (t_redircmd *)cmd;
-		process_quoted_args(rcmd->subcmd);
-	}
-	else if (cmd->type == EXEC)
-	{
-		ecmd = (t_execcmd *)cmd;
-		if (ecmd->argv[0] && (ft_strcmp(ecmd->argv[0], "grep") == 0 || ft_strcmp(ecmd->argv[0], "cat") == 0))
-		{
-			for (int i = 1; ecmd->argv[i]; i++)
-			{
-				if (ecmd->argv[i][0] == '\"' && ecmd->argv[i][ft_strlen(ecmd->argv[i]) - 1] == '\"')
-				{
-					ecmd->argv[i] = ecmd->argv[i] + 1;
-					ecmd->eargv[i] = ecmd->eargv[i] - 1;
-					ecmd->eargv[i][0] = '\0';
-				}
-			}
-		}
-	}
-}
 
 void	execute_command(t_params *params, int *exit_status)
 {
@@ -129,7 +97,7 @@ void	execute_command(t_params *params, int *exit_status)
 	if (forking() == 0)
 	{
 		save_child_pid(getpid());
-		process_quoted_args(params->tree);
+		// process_quoted_args(params->tree);
 		run_cmd(params->tree, params, exit_status);
 	}
 	int status;
@@ -143,19 +111,43 @@ void	execute_command(t_params *params, int *exit_status)
 	cleanup(params);
 }
 
-
-int	is_whitespace_string(char *str)
+void	display_tree(t_cmd *cmd)
 {
-	int	i;
+	t_execcmd	*ecmd;
+	t_redircmd	*rcmd;
+	t_pipecmd	*pcmd;
 
-	i = 0;
-	while (str[i])
+	if (cmd->type == PIPE)
 	{
-		if (!is_whitespace(str[i]))
-			return (0);
-		i++;
+		pcmd = (t_pipecmd *)cmd;
+		printf("=======PIPE======\n\n");
+		printf("=======Pipe Left======\n");
+		display_tree(pcmd->left);
+		printf("=======Pipe Right======\n");
+		display_tree(pcmd->right);
 	}
-	return (1);
+	else if (cmd->type == REDIR)
+	{
+		rcmd = (t_redircmd *)cmd;
+		printf("=======REDIR======\n");
+		printf("The file is : %s\n", rcmd->file);
+		printf("The fd is : %d\n", rcmd->fd);
+		printf("The redir is : %c\n", rcmd->r_type);
+		printf("My subcmd is : \n");
+		display_tree(rcmd->subcmd);
+	}
+	else if (cmd->type == EXEC)
+	{
+		ecmd = (t_execcmd *)cmd;
+		printf("=========EXEC=======\n");
+		printf("The command is : ");
+		int i;
+		for (i = 0; ecmd->argv[i]; i++)
+		{
+			printf("%s ", ecmd->argv[i]);
+		}
+		printf("\n\n");
+	}
 }
 
 
@@ -166,7 +158,9 @@ int main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
+	exit_status = 0;
 	params.env_var_list = NULL;
+	init_queue(&params.args_queue);
 	init_env_var_list(envp, &params.env_var_list);
 	while (1)
 	{
@@ -188,11 +182,21 @@ int main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		params.tree = parse_cmd(params.buf, &exit_status);
+		process_args(params.tree, &params, &exit_status);
+		
+		// display_tree(params.tree);
+		
+		// free1(params.buf);
+		// free_tree(params.tree);
+		// free_queue(&params.args_queue);
+
+		
 		if (is_built_in_command(params.tree))
 		{
 			execute_built_in_command((t_execcmd *)params.tree, &params.env_var_list, &exit_status);
 			free1(params.buf);
 			free_tree(params.tree);
+			free_queue(&params.args_queue);
 		}
 		else
 			execute_command(&params, &exit_status);

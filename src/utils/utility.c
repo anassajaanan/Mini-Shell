@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 10:45:27 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/29 14:43:20 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/01 14:46:38 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,20 @@ int	is_whitespace(char c)
 		|| c == '\r')
 		return (1);
 	return (0);
+}
+
+int	is_whitespace_string(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (!is_whitespace(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 void	panic(char *s)
@@ -77,6 +91,7 @@ void	free_exit(t_params *params, int exit_status)
 	free1(params->buf);
 	free_tree(params->tree);
 	free_env_var_list(params->env_var_list);
+	free_queue(&params->args_queue);
 	exit(exit_status);
 }
 
@@ -85,6 +100,7 @@ void	free_panic_exit(t_params *params, char *error, int exit_status)
 	free1(params->buf);
 	free_tree(params->tree);
 	free_env_var_list(params->env_var_list);
+	free_queue(&params->args_queue);
 	perror(error);
 	exit(exit_status);
 }
