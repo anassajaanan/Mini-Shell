@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 08:25:55 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 20:00:34 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 13:46:51 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	signal_handler(int signum)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
-		ft_putstr_fd("\033[2K\rminishell$ ", 2);
+		ft_putstr_fd(BCYN "\033[2K\rminishell$ " RESET, 2);
 	}
 }
 
