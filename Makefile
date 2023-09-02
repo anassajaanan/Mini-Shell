@@ -57,12 +57,11 @@ OBJS		=	$(SRCS:.c=.o)
 
 all			:	${NAME}
 
-
-${NAME}		:	libft ${OBJS}
+${NAME}		:	${OBJS}
+				@make -C ./lib/libft
 				$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) $(LIB_FLAGS) -o $(NAME)
 
-libft		:
-				@make -C ./lib/libft
+
 
 %.o			:	%.c
 				$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -78,19 +77,3 @@ fclean		:	clean
 re			:	fclean all
 
 .PHONY		:	all clean fclean re
-
-
-# **************************************************************************** #
-# 									VALGRIND								   #
-
-leaks_fd:
-	make re && make clean && valgrind --track-fds=yes  ./minishell
-# --suppressions=supress_readline \
-# --log-file=valgrind-out.txt 
-leaks:
-	make re && make clean \
-	&& valgrind --leak-check=full \
-	--track-origins=yes \
-	--show-leak-kinds=all --suppressions=.ignore_readline.txt --log-file=valgrind-out.txt \
-	./minishell
-# **************************************************************************** #
