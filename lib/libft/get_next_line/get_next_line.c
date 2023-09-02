@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:16:04 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 14:33:18 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 08:08:28 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,9 @@ char	*handle_bytes(ssize_t bytes, t_queue_char *q, char *buffer, int *fd)
 char	*get_next_line(int fd)
 {
 	static t_queue_char	q;
-	ssize_t			bytes;
-	char			*buffer;
-	static int		flag = 0;
+	ssize_t				bytes;
+	char				*buffer;
+	static int			flag = 0;
 
 	if (fd == -1 || BUFFER_SIZE <= 0)
 		return (NULL);

@@ -14,6 +14,7 @@ endif
 SRCS		=	src/main.c \
 				src/command.c \
 				src/process_args.c \
+				src/helpers.c \
 \
 				src/env/env_var.c \
 				src/env/env_var_utils.c \

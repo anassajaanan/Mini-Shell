@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 14:56:35 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/08/26 14:35:24 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 08:10:24 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	enqueue_char(t_queue_char *q, char c)
 {
 	struct s_queue_node_char	*new_node;
 
-	new_node = (struct s_queue_node_char *)malloc(sizeof(struct s_queue_node_char));
+	new_node = (struct s_queue_node_char *)malloc(sizeof(
+				struct s_queue_node_char));
 	if (!new_node)
 		return ;
 	new_node->val = c;
@@ -41,7 +42,7 @@ void	enqueue_char(t_queue_char *q, char c)
 
 char	dequeue_char(t_queue_char *q)
 {
-	char				value;
+	char						value;
 	struct s_queue_node_char	*tmp;
 
 	tmp = q->front;
