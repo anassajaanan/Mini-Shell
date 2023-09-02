@@ -6,12 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 15:41:40 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 16:47:35 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
 #include "../../include/env.h"
+#include "../../include/minishell.h"
 
 t_env_var	*env_var_new(char *key, char *value)
 {
@@ -87,8 +87,8 @@ void	init_env_var_list(char **envp, t_env_var **env_var_list)
 	char		*equal_sign;
 	t_env_var	*new_node;
 
-	i = 0;
-	while (envp[i])
+	i = -1;
+	while (envp[++i])
 	{
 		equal_sign = ft_strchr(envp[i], '=');
 		if (equal_sign)
@@ -97,9 +97,7 @@ void	init_env_var_list(char **envp, t_env_var **env_var_list)
 			value = ft_strdup(equal_sign + 1);
 			if (ft_strcmp(key, "OLDPWD") == 0)
 			{
-				new_node = env_var_new(key, NULL);
-				env_var_insert_sorted(env_var_list, new_node);
-				free(value);
+				init_old_pwd(key, value, env_var_list, new_node);
 				return ;
 			}
 			new_node = env_var_new(key, value);
@@ -107,7 +105,6 @@ void	init_env_var_list(char **envp, t_env_var **env_var_list)
 		else
 			new_node = env_var_new(ft_strdup(envp[i]), NULL);
 		env_var_insert_sorted(env_var_list, new_node);
-		i++;
 	}
 }
 

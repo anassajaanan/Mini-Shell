@@ -6,14 +6,59 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 14:46:22 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:49:57 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 16:53:21 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/execution.h"
 
-static char	*get_herdoc_input(char *delimiter, t_params *params)
+static void	process_herdoc_input_dollar(char *line, int *i, t_params *params,
+	t_queue_char *q)
+{
+	char	*var_name;
+	char	*var_value;
+
+	(*i)++;
+	var_name = getvar_name(line + *i);
+	var_value = getenv_value(var_name, params->env_var_list);
+	if (var_value)
+		enqueue_str(q, var_value);
+	*i += ft_strlen(var_name);
+	free1(var_name);
+}
+
+static char	*precess_herdoc_input(char *line, t_params *params,
+	int *exit_status)
+{
+	int				i;
+	t_queue_char	q;
+	char			*exit_status_str;
+
+	i = 0;
+	init_queue_char(&q);
+	while (line[i])
+	{
+		if (line[i] == '$' && line[i + 1] == '?')
+		{
+			exit_status_str = ft_itoa(*exit_status);
+			enqueue_str(&q, exit_status_str);
+			free(exit_status_str);
+			i += 2;
+		}
+		else if (line[i] == '$' && (is_whitespace(line[i + 1])))
+			enqueue_char(&q, line[i++]);
+		else if (line[i] == '$')
+			process_herdoc_input_dollar(line, &i, params, &q);
+		else
+			enqueue_char(&q, line[i++]);
+	}
+	free1(line);
+	return (queue_char_to_str(&q));
+}
+
+static char	*get_herdoc_input(char *delimiter, t_params *params,
+	int *exit_status)
 {
 	t_queue	q;
 	char	*line;
@@ -37,7 +82,7 @@ static char	*get_herdoc_input(char *delimiter, t_params *params)
 			free(line);
 			break ;
 		}
-		enqueue(&q, line);
+		enqueue(&q, precess_herdoc_input(line, params, exit_status));
 	}
 	return (queue_to_str(&q));
 }
@@ -70,7 +115,7 @@ void	run_redir(t_cmd *cmd, t_params *params, int *exit_status)
 	}
 	else
 	{
-		herdoc_input = get_herdoc_input(rcmd->file, params);
+		herdoc_input = get_herdoc_input(rcmd->file, params, exit_status);
 		write_herdoc_input(herdoc_input, params);
 		free(herdoc_input);
 		close(rcmd->fd);

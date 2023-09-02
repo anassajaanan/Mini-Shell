@@ -34,7 +34,6 @@ SRCS		=	src/main.c \
 				src/execution/run_exec_utils.c \
 				src/execution/run_pipe.c \
 				src/execution/run_redir.c \
-				src/execution/run_redir_utils.c \
 \
 				src/builtins/cd.c \
 				src/builtins/echo.c \
