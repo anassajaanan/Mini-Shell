@@ -13,7 +13,6 @@ endif
 
 SRCS		=	src/main.c \
 				src/command.c \
-				src/process_args.c \
 				src/helpers.c \
 \
 				src/env/env_var.c \
@@ -26,6 +25,9 @@ SRCS		=	src/main.c \
 				src/parsing/token_helpers.c \
 				src/parsing/validate_helpers.c \
 				src/parsing/validate.c \
+				src/parsing/process_args.c \
+				src/parsing/process_args_utils.c \
+				src/parsing/process_args_helpers.c \
 \
 				src/execution/run_cmd.c \
 				src/execution/run_exec.c \
