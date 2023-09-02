@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 13:00:08 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 20:09:46 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 10:06:28 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ t_cmd	*parse_cmd(char *buf, int *exit_status)
 			ft_printf_fd(STDERR_FILENO, "minishell: syntax error\n");
 		*exit_status = 258;
 		free_tree(cmd);
-		free(buf);
 		return (NULL);
 	}
 	null_terminate_command(cmd);

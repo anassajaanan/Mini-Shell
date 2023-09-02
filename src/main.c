@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 08:41:43 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 10:08:37 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,11 @@ void	execute_shell_command(t_params *params, int *exit_status)
 {
 	add_history(params->buf);
 	params->tree = parse_cmd(params->buf, exit_status);
+	if (!params->tree)
+	{
+		free1(params->buf);
+		return ;
+	}
 	process_args(params->tree, params, exit_status);
 	if (is_built_in_command(params->tree))
 	{
