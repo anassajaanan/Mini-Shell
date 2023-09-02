@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/27 08:25:55 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 13:46:51 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 14:33:36 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,6 @@ void	signal_handler(int signum)
 	}
 	else if (signum == SIGQUIT)
 	{
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		ft_putstr_fd(BCYN "\033[2K\rminishell$ " RESET, 2);
 	}
 }
 
@@ -68,7 +64,7 @@ void	signal_handler_input(int signum)
 void	setup_signals(void)
 {
 	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	set_signal_handler(t_cmd *tree)
