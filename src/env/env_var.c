@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 16:47:35 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 17:09:49 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,45 +79,39 @@ void	env_var_insert_sorted(t_env_var **env_var_list, t_env_var *new_node)
 	new_node->next = p;
 }
 
-void	init_env_var_list(char **envp, t_env_var **env_var_list)
+void	env_var_add(char **envp, int i, t_env_var **env_var_list)
 {
-	int			i;
 	char		*key;
 	char		*value;
 	char		*equal_sign;
 	t_env_var	*new_node;
 
-	i = -1;
-	while (envp[++i])
+	equal_sign = ft_strchr(envp[i], '=');
+	if (equal_sign)
 	{
-		equal_sign = ft_strchr(envp[i], '=');
-		if (equal_sign)
+		key = ft_substr(envp[i], 0, equal_sign - envp[i]);
+		value = ft_strdup(equal_sign + 1);
+		if (ft_strcmp(key, "OLDPWD") == 0)
 		{
-			key = ft_substr(envp[i], 0, equal_sign - envp[i]);
-			value = ft_strdup(equal_sign + 1);
-			if (ft_strcmp(key, "OLDPWD") == 0)
-			{
-				init_old_pwd(key, value, env_var_list, new_node);
-				return ;
-			}
-			new_node = env_var_new(key, value);
+			new_node = env_var_new(key, NULL);
+			free(value);
 		}
 		else
-			new_node = env_var_new(ft_strdup(envp[i]), NULL);
-		env_var_insert_sorted(env_var_list, new_node);
+			new_node = env_var_new(key, value);
 	}
+	else
+		new_node = env_var_new(ft_strdup(envp[i]), NULL);
+	env_var_insert_sorted(env_var_list, new_node);
 }
 
-char	*getenv_value(char *key, t_env_var *env_var_list)
+void	init_env_var_list(char **envp, t_env_var **env_var_list)
 {
-	t_env_var	*tmp;
+	int	i;
 
-	tmp = env_var_list;
-	while (tmp)
+	i = 0;
+	while (envp[i])
 	{
-		if (ft_strcmp(tmp->key, key) == 0)
-			return (tmp->value);
-		tmp = tmp->next;
+		env_var_add(envp, i, env_var_list);
+		i++;
 	}
-	return (NULL);
 }

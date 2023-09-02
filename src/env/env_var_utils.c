@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 12:23:23 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 16:47:52 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 17:08:41 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,16 @@ void	free_env_var_list(t_env_var *env_var_list)
 	}
 }
 
-void	init_old_pwd(char *key, char *value, t_env_var **env_var_list,
-		t_env_var *new_node)
+char	*getenv_value(char *key, t_env_var *env_var_list)
 {
-	new_node = env_var_new(key, NULL);
-	env_var_insert_sorted(env_var_list, new_node);
-	free(value);
+	t_env_var	*tmp;
+
+	tmp = env_var_list;
+	while (tmp)
+	{
+		if (ft_strcmp(tmp->key, key) == 0)
+			return (tmp->value);
+		tmp = tmp->next;
+	}
+	return (NULL);
 }
