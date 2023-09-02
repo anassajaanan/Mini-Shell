@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:58:17 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 15:32:05 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,14 @@ void	init_env_var_list(char **envp, t_env_var **env_var_list)
 		{
 			key = ft_substr(envp[i], 0, equal_sign - envp[i]);
 			value = ft_strdup(equal_sign + 1);
+			// if (ft_strcmp(key, "OLDPWD") == 0)
+			// {
+			// 	new_node = env_var_new(key, NULL);
+			// 	env_var_insert_sorted(env_var_list, new_node);
+			// 	free(value);
+			// 	return ;
+				
+			// }
 			new_node = env_var_new(key, value);
 		}
 		else
