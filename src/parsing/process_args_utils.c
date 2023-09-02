@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/02 11:59:08 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 12:10:10 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/02 13:19:12 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,8 @@ void	process_double_quote(int *values[2], char *arg, t_queue_char *q,
 		t_params *params)
 {
 	int	*i;
-	int	*exit_status;
 
 	i = values[0];
-	exit_status = values[1];
 	(*i)++;
 	while (arg[*i] && arg[*i] != '\"')
 	{
