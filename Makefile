@@ -3,13 +3,16 @@ NAME		=	minishell
 CC			=	gcc
 CFLAGS		=	-Wall -Wextra -Werror -g
 
-ifeq ($(shell uname -p), i386)
-	LIB_FLAGS	=	-L./lib/libft -lft -L/usr/local/Cellar/readline/8.1/lib -lreadline
-	INCLUDES	=	-I./include -I./lib/libft -I/usr/local/Cellar/readline/8.1/include
-else
-	LIB_FLAGS	=	-L./lib/libft -lft -lreadline
-	INCLUDES	=	-I./include -I./lib/libft
-endif
+# ifeq ($(shell uname -p), i386)
+# 	LIB_FLAGS	=	-L./lib/libft -lft -L/usr/local/Cellar/readline/8.1/lib -lreadline
+# 	INCLUDES	=	-I./include -I./lib/libft -I/usr/local/Cellar/readline/8.1/include
+# else
+# 	LIB_FLAGS	=	-L./lib/libft -lft -lreadline
+# 	INCLUDES	=	-I./include -I./lib/libft
+# endif
+
+LIB_FLAGS	=	-L./lib/libft -lft -L./lib/readline/lib -lreadline
+	INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include
 
 SRCS		=	src/main.c \
 				src/command.c \

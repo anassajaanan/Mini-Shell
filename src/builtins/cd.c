@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 09:02:21 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 16:52:05 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/03 18:25:12 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@ void	update_pwd(t_env_var *env_var_list)
 	t_env_var	*old_pwd_node;
 
 	pwd = getcwd(NULL, 0);
+	if (!pwd)
+	{
+		ft_printf_fd(2, "minishell: cd: error retrieving current directory: \
+getcwd: cannot access parent directories: No such file or directory\n");
+		return ;
+	}
 	tmp = env_var_list;
 	while (tmp)
 	{
