@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 17:44:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 13:09:52 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:37:35 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 void	echo(char **argv);
 
 // #=====================# env #=====================#
-void	env(t_env_var **env_var_list);
+void	env(char **argv, t_params *params);
 
 // #=====================# export #=====================#
 // ******* export_utils.c ******** //

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 09:09:23 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 10:12:14 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/03 18:41:58 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef struct s_redirdata
 typedef struct s_params
 {
 	char		*buf;
+	char		**envp;
 	t_env_var	*env_var_list;
 	t_cmd		*tree;
 	t_queue		args_queue;

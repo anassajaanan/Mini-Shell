@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:19:59 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:37:00 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	is_builtin_command(t_execcmd *ecmd)
 		return (1);
 	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
 		return (1);
-	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
+	else if (ft_strcmp(ecmd->argv[0], "env") == 0)
 		return (1);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
 		return (1);
@@ -38,8 +38,8 @@ void	execute_builtin_commands(t_execcmd *ecmd, t_params *params,
 		echo(ecmd->argv);
 	else if (ft_strcmp(ecmd->argv[0], "exit") == 0)
 		exit_command(ecmd->argv, params);
-	else if (ft_strcmp(ecmd->argv[0], "env") == 0 && ecmd->argv[1] == NULL)
-		env(&params->env_var_list);
+	else if (ft_strcmp(ecmd->argv[0], "env") == 0)
+		env(ecmd->argv, params);
 	else if (ft_strcmp(ecmd->argv[0], "export") == 0)
 		export(ecmd->argv, params->env_var_list);
 	else if (ft_strcmp(ecmd->argv[0], "unset") == 0)
@@ -70,7 +70,7 @@ void	execute_external_command(t_cmd *cmd, t_params *params)
 			ecmd->argv[0]);
 		free_exit(params, 127);
 	}
-	execve(binary_path, ecmd->argv, NULL);
+	execve(binary_path, ecmd->argv, params->envp);
 	free1(binary_path);
 	free_exit(params, 126);
 }
@@ -91,7 +91,7 @@ void	run_exec(t_cmd *cmd, t_params *params, int *exit_status)
 	{
 		if (access(ecmd->argv[0], X_OK) == 0)
 		{
-			execve(ecmd->argv[0], ecmd->argv, NULL);
+			execve(ecmd->argv[0], ecmd->argv, params->envp);
 			ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n",
 				ecmd->argv[0]);
 			free_exit(params, 127);

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 10:08:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:05:25 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 void	execute_command(t_params *params, int *exit_status)
 {
-	int	status;
+	int			status;
+	t_execcmd	*ecmd;
 
 	set_signal_handler(params->tree);
 	if (forking(params) == 0)
@@ -24,12 +25,21 @@ void	execute_command(t_params *params, int *exit_status)
 	}
 	waitpid(-1, &status, 0);
 	get_exit_status(params->tree, params, exit_status, status);
-	if (params->tree->type == EXEC
-		&& ft_strcmp(((t_execcmd *)params->tree)->argv[0], "exit") == 0)
+	ecmd = (t_execcmd *)params->tree;
+	if (ecmd->type == EXEC && ft_strcmp(ecmd->argv[0], "exit") == 0)
 	{
-		unlink("/tmp/exit_status.tmp");
-		unlink("/tmp/child_pid.tmp");
-		free_exit(params, *exit_status);
+		if (!ecmd->argv[1])
+		{
+			unlink("/tmp/exit_status.tmp");
+			unlink("/tmp/child_pid.tmp");
+			free_exit(params, *exit_status);
+		}
+		if (ecmd->argv[1] && (!is_numeric(ecmd->argv[1]) || !ecmd->argv[2]))
+		{
+			unlink("/tmp/exit_status.tmp");
+			unlink("/tmp/child_pid.tmp");
+			free_exit(params, *exit_status);
+		}
 	}
 	cleanup(params);
 }
@@ -38,6 +48,7 @@ void	initialize_shell_environment(t_params *params, int *exit_status,
 		char **envp)
 {
 	*exit_status = 0;
+	params->envp = envp;
 	params->env_var_list = NULL;
 	init_queue(&params->args_queue);
 	init_env_var_list(envp, &params->env_var_list);

@@ -6,27 +6,12 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:57:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 08:40:59 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
-
-static int	is_numeric(const char *str)
-{
-	if (*str && (*str == '+' || *str == '-'))
-		str++;
-	if (*str == '\0')
-		return (0);
-	while (*str)
-	{
-		if (*str < '0' || *str > '9')
-			return (0);
-		str++;
-	}
-	return (1);
-}
 
 void	handle_non_numeric_arg(char *arg, t_params *params)
 {

@@ -12,7 +12,7 @@ CFLAGS		=	-Wall -Wextra -Werror -g
 # endif
 
 LIB_FLAGS	=	-L./lib/libft -lft -L./lib/readline/lib -lreadline
-	INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include
+INCLUDES	=	-I./include -I./lib/libft -I./lib/readline/include
 
 SRCS		=	src/main.c \
 				src/command.c \
