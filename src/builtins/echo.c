@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/01 12:09:05 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:51:02 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:37:59 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-int	is_newline_flag(char *str)
+static int	is_newline_flag(char *str)
 {
 	int	i;
 

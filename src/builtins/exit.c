@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/22 08:11:59 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/04 08:40:59 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:38:17 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/builtins.h"
 
-void	handle_non_numeric_arg(char *arg, t_params *params)
+static void	handle_non_numeric_arg(char *arg, t_params *params)
 {
 	ft_printf("exit\n");
 	ft_printf_fd(STDERR_FILENO,
@@ -21,7 +21,7 @@ void	handle_non_numeric_arg(char *arg, t_params *params)
 	free_exit(params, 255);
 }
 
-void	handle_too_many_args(t_params *params)
+static void	handle_too_many_args(t_params *params)
 {
 	ft_printf("exit\n");
 	ft_printf_fd(STDERR_FILENO, "minishell: exit: too many arguments\n");

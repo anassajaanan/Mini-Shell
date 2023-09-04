@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 13:13:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 19:45:25 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:40:54 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../../include/execution.h"
 #include <sys/wait.h>
 
-void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params,
+static void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params,
 	int *exit_status)
 {
 	close(fd[0]);
@@ -24,7 +24,7 @@ void	execute_left_subtree(t_cmd *cmd, int fd[2], t_params *params,
 	exit(0);
 }
 
-void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params,
+static void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params,
 	int *exit_status)
 {
 	close(fd[1]);
@@ -34,7 +34,7 @@ void	execute_right_subtree(t_cmd *cmd, int fd[2], t_params *params,
 	exit(0);
 }
 
-void	write_exit_status_to_file(t_params *params, int exit_status)
+static void	write_exit_status_to_file(t_params *params, int exit_status)
 {
 	int	fd;
 
@@ -46,7 +46,7 @@ void	write_exit_status_to_file(t_params *params, int exit_status)
 	close(fd);
 }
 
-void	set_signals(void)
+static void	set_signals(void)
 {
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);

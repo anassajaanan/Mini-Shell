@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 17:32:19 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/01 20:09:56 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:42:45 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/parsing.h"
 
-int	validate_syntax(char *buf, int *exit_status)
+static int	validate_syntax(char *buf, int *exit_status)
 {
 	char	*ps;
 	char	*es;
@@ -42,7 +42,7 @@ int	validate_syntax(char *buf, int *exit_status)
 	return (1);
 }
 
-int	contains_unbalanced_quotes(char *buf, int *exit_status)
+static int	contains_unbalanced_quotes(char *buf, int *exit_status)
 {
 	int	i;
 	int	tok;

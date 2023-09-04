@@ -6,14 +6,14 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/26 15:30:45 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/03 20:37:00 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:39:55 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "../../include/execution.h"
 
-int	is_builtin_command(t_execcmd *ecmd)
+static int	is_builtin_command(t_execcmd *ecmd)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
 		return (1);
@@ -31,7 +31,7 @@ int	is_builtin_command(t_execcmd *ecmd)
 		return (0);
 }
 
-void	execute_builtin_commands(t_execcmd *ecmd, t_params *params,
+static void	execute_builtin_commands(t_execcmd *ecmd, t_params *params,
 	int exit_status)
 {
 	if (ft_strcmp(ecmd->argv[0], "echo") == 0)
@@ -48,7 +48,7 @@ void	execute_builtin_commands(t_execcmd *ecmd, t_params *params,
 		pwd(&exit_status);
 }
 
-void	execute_external_command(t_cmd *cmd, t_params *params)
+static void	execute_external_command(t_cmd *cmd, t_params *params)
 {
 	t_execcmd	*ecmd;
 	char		*path_var;

@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/23 17:34:12 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 12:06:38 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:43:00 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ int		peek(char **ps, char *es, char *tokens);
 // ┌─────────────────────────────┐
 // │         validate.c          │
 // └─────────────────────────────┘
-int		validate_syntax(char *buf, int *exit_status);
-int		contains_unbalanced_quotes(char *buf, int *exit_status);
 int		validate_command(char *buf, int *exit_status);
 
 // ┌───────────────────────────────────┐

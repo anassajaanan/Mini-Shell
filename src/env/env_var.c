@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/04 10:04:49 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/02 17:09:49 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:39:19 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	env_var_insert_sorted(t_env_var **env_var_list, t_env_var *new_node)
 	new_node->next = p;
 }
 
-void	env_var_add(char **envp, int i, t_env_var **env_var_list)
+static void	env_var_add(char **envp, int i, t_env_var **env_var_list)
 {
 	char		*key;
 	char		*value;

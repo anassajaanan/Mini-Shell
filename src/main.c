@@ -6,13 +6,13 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/04 09:05:25 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/04 09:45:42 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-void	execute_command(t_params *params, int *exit_status)
+static void	execute_command(t_params *params, int *exit_status)
 {
 	int			status;
 	t_execcmd	*ecmd;
@@ -44,7 +44,7 @@ void	execute_command(t_params *params, int *exit_status)
 	cleanup(params);
 }
 
-void	initialize_shell_environment(t_params *params, int *exit_status,
+static void	initialize_shell_environment(t_params *params, int *exit_status,
 		char **envp)
 {
 	*exit_status = 0;
@@ -62,7 +62,7 @@ int	is_valid_shell_input(char *buf, int *exit_status)
 	return (1);
 }
 
-void	execute_shell_command(t_params *params, int *exit_status)
+static void	execute_shell_command(t_params *params, int *exit_status)
 {
 	add_history(params->buf);
 	params->tree = parse_cmd(params->buf, exit_status);
