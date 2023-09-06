@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/11 14:53:51 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/04 09:45:42 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/06 07:34:07 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,8 @@ static void	execute_command(t_params *params, int *exit_status)
 	ecmd = (t_execcmd *)params->tree;
 	if (ecmd->type == EXEC && ft_strcmp(ecmd->argv[0], "exit") == 0)
 	{
-		if (!ecmd->argv[1])
-		{
-			unlink("/tmp/exit_status.tmp");
-			unlink("/tmp/child_pid.tmp");
-			free_exit(params, *exit_status);
-		}
-		if (ecmd->argv[1] && (!is_numeric(ecmd->argv[1]) || !ecmd->argv[2]))
+		if (!ecmd->argv[1] || (ecmd->argv[1]
+				&& (!is_numeric(ecmd->argv[1]) || !ecmd->argv[2])))
 		{
 			unlink("/tmp/exit_status.tmp");
 			unlink("/tmp/child_pid.tmp");

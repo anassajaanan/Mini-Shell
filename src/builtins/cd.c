@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/15 09:02:21 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/04 09:36:37 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/06 07:31:52 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ getcwd: cannot access parent directories: No such file or directory\n");
 	}
 }
 
-static void	change_to_home_directory(int *exit_status, t_env_var *env_var_list)
+static void	change_to_home_directory(int *exit_status,
+	t_env_var *env_var_list)
 {
 	char	*home_dir;
 
@@ -75,7 +76,8 @@ static void	cd_oldpwd_check(t_env_var *env_var_list, int *exit_status)
 	}
 }
 
-static void	cd_path_check(char **argv, int *exit_status, t_env_var *env_var_list)
+static void	cd_path_check(char **argv, int *exit_status,
+	t_env_var *env_var_list)
 {
 	char	*path;
 
