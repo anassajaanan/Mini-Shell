@@ -6,7 +6,7 @@
 /*   By: aajaanan <aajaanan@student.42abudhabi.a    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/24 13:13:57 by aajaanan          #+#    #+#             */
-/*   Updated: 2023/09/04 09:40:54 by aajaanan         ###   ########.fr       */
+/*   Updated: 2023/09/06 19:01:24 by aajaanan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	run_pipe(t_cmd *cmd, t_params *params, int *exit_status)
 	int			pid1;
 	int			pid2;
 	int			status;
+	int			is_herdoc = 0;
 	t_pipecmd	*pcmd;
 
 	pcmd = (t_pipecmd *)cmd;
@@ -65,13 +66,23 @@ void	run_pipe(t_cmd *cmd, t_params *params, int *exit_status)
 	pid1 = forking(params);
 	if (pid1 == 0)
 		execute_left_subtree(pcmd->left, fd, params, exit_status);
+	if (pcmd->left->type == REDIR && ((t_redircmd *)pcmd->left)->r_type == '%')
+	{
+		close(fd[0]);
+		close(fd[1]);
+		waitpid(pid1, NULL, 0);
+		is_herdoc = 1;
+	}
 	pid2 = forking(params);
 	if (pid2 == 0)
 		execute_right_subtree(pcmd->right, fd, params, exit_status);
-	close(fd[0]);
-	close(fd[1]);
 	set_signals();
-	waitpid(pid1, NULL, 0);
+	if (!is_herdoc)
+	{
+		close(fd[0]);
+		close(fd[1]);
+		waitpid(pid1, NULL, 0);
+	}
 	waitpid(pid2, &status, 0);
 	if (WIFEXITED(status))
 		*exit_status = WEXITSTATUS(status);
